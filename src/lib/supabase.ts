@@ -84,12 +84,15 @@ export interface Database {
           created_at?: string
         }
       }
-      users: {
+      user_profiles: {
         Row: {
           id: string
           username: string
           full_name: string | null
           avatar_url: string | null
+          bio: string | null
+          website: string | null
+          location: string | null
           created_at: string
           updated_at: string
         }
@@ -98,6 +101,9 @@ export interface Database {
           username: string
           full_name?: string | null
           avatar_url?: string | null
+          bio?: string | null
+          website?: string | null
+          location?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -106,6 +112,64 @@ export interface Database {
           username?: string
           full_name?: string | null
           avatar_url?: string | null
+          bio?: string | null
+          website?: string | null
+          location?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      follows: {
+        Row: {
+          id: string
+          follower_id: string
+          following_id: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          follower_id: string
+          following_id: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          follower_id?: string
+          following_id?: string
+          created_at?: string
+        }
+      }
+      contact_messages: {
+        Row: {
+          id: string
+          name: string
+          email: string
+          subject: string
+          message: string
+          category: string
+          status: 'new' | 'read' | 'replied' | 'closed'
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          email: string
+          subject: string
+          message: string
+          category: string
+          status?: 'new' | 'read' | 'replied' | 'closed'
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          email?: string
+          subject?: string
+          message?: string
+          category?: string
+          status?: 'new' | 'read' | 'replied' | 'closed'
           created_at?: string
           updated_at?: string
         }
@@ -122,3 +186,4 @@ export interface Database {
     }
   }
 }
+

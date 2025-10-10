@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import Logo from './Logo';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -18,6 +19,42 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalP
   const [error, setError] = useState('');
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
+  const [checkingUsername, setCheckingUsername] = useState(false);
+
+  const checkUsernameAvailability = async (username: string) => {
+    if (!username) {
+      setUsernameAvailable(null);
+      return;
+    }
+
+    setCheckingUsername(true);
+    try {
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('id')
+        .eq('username', username);
+
+      if (error) throw error;
+      setUsernameAvailable(data.length === 0);
+    } catch (err) {
+      setUsernameAvailable(false);
+    } finally {
+      setCheckingUsername(false);
+    }
+  };
+
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setUsername(value);
+    
+    // Debounce username check
+    const timeoutId = setTimeout(() => {
+      checkUsernameAvailability(value);
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  };
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,7 +198,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalP
                 setShowForgotPassword(false);
                 setError('');
               }}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 px-4 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium"
+              className="w-full bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800 transition-all duration-200 font-medium"
             >
               Back to Sign In
             </button>
@@ -186,8 +223,8 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalP
         <div className="p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <span className="text-white font-bold text-xl">N</span>
+            <div className="w-12 h-12 flex items-center justify-center mx-auto mb-4">
+              <Logo className="" size="lg" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
               {showForgotPassword ? 'Reset Password' : (isLogin ? 'Welcome back' : 'Join NanoB')}
@@ -288,15 +325,44 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalP
                     <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
                       Username
                     </label>
-                    <input
-                      id="username"
-                      type="text"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      required={!isLogin}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                      placeholder="Choose a username"
-                    />
+                    <div className="relative">
+                      <input
+                        id="username"
+                        type="text"
+                        value={username}
+                        onChange={handleUsernameChange}
+                        required={!isLogin}
+                        className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-black focus:border-transparent transition-all ${
+                          usernameAvailable === false ? 'border-red-300' : 'border-gray-300'
+                        }`}
+                        placeholder="Choose a username"
+                      />
+                      {checkingUsername && (
+                        <div className="absolute right-3 top-3">
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-black"></div>
+                        </div>
+                      )}
+                      {usernameAvailable === true && (
+                        <div className="absolute right-3 top-3">
+                          <svg className="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                      )}
+                      {usernameAvailable === false && (
+                        <div className="absolute right-3 top-3">
+                          <svg className="h-5 w-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+                    {usernameAvailable === false && (
+                      <p className="text-sm text-red-600 mt-1">Username is already taken</p>
+                    )}
+                    {usernameAvailable === true && (
+                      <p className="text-sm text-green-600 mt-1">Username is available</p>
+                    )}
                   </div>
                 )}
 
@@ -351,7 +417,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalP
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-black text-white py-3 px-4 rounded-xl hover:bg-gray-800 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <div className="flex items-center justify-center">

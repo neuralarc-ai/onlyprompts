@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
 
 interface Prompt {
   id: string;
@@ -78,7 +77,7 @@ export default function PromptModal({ isOpen, onClose, prompt }: PromptModalProp
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-2xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xs font-medium px-3 py-1 rounded-full">
+              <span className="bg-black text-white text-xs font-medium px-3 py-1 rounded-full">
                 {prompt.category}
               </span>
               <span className="text-sm text-gray-500">
@@ -101,12 +100,30 @@ export default function PromptModal({ isOpen, onClose, prompt }: PromptModalProp
           {/* Image */}
           <div className="relative h-64 w-full mb-6 rounded-xl overflow-hidden">
             {prompt.image_url && prompt.image_url.trim() !== '' ? (
-              <Image
+              <img
                 src={prompt.image_url}
                 alt={prompt.title}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
+                className="w-full h-full object-cover"
+                loading="lazy"
+                referrerPolicy="no-referrer"
+                onError={(e) => {
+                  // Fallback to placeholder if image fails to load
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const parent = target.parentElement;
+                  if (parent) {
+                    parent.innerHTML = `
+                      <div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                        <div class="text-center">
+                          <svg class="h-16 w-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                          </svg>
+                          <p class="text-gray-500">Image failed to load</p>
+                        </div>
+                      </div>
+                    `;
+                  }
+                }}
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
@@ -148,7 +165,7 @@ export default function PromptModal({ isOpen, onClose, prompt }: PromptModalProp
                 onClick={handleCopy}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isCopied 
-                    ? 'bg-green-100 text-green-600' 
+                    ? 'bg-black text-white' 
                     : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300'
                 }`}
               >
@@ -172,7 +189,7 @@ export default function PromptModal({ isOpen, onClose, prompt }: PromptModalProp
                 onClick={handleLike}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isLiked 
-                    ? 'bg-red-100 text-red-600' 
+                    ? 'bg-black text-white' 
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >

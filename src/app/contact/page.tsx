@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { useContactMessages } from '@/hooks/useContactMessages';
 
 interface ContactForm {
   name: string;
@@ -13,6 +14,7 @@ interface ContactForm {
 }
 
 export default function ContactPage() {
+  const { submitContactMessage } = useContactMessages();
   const [formData, setFormData] = useState<ContactForm>({
     name: '',
     email: '',
@@ -23,6 +25,7 @@ export default function ContactPage() {
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   const categories = [
     'General Inquiry',
@@ -44,12 +47,13 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitStatus('idle');
+    setErrorMessage('');
     
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      console.log('Contact form submitted:', formData);
+    const result = await submitContactMessage(formData);
+
+    if (result.success) {
+      console.log('Contact message sent successfully:', result.data);
       setSubmitStatus('success');
       
       // Reset form
@@ -60,11 +64,14 @@ export default function ContactPage() {
         message: '',
         category: ''
       });
-    } catch (error) {
+    } else {
+      console.error('Error sending contact message:', result.error);
+      console.error('Full error details:', result);
       setSubmitStatus('error');
-    } finally {
-      setIsSubmitting(false);
+      setErrorMessage(result.error || 'Failed to send message');
     }
+    
+    setIsSubmitting(false);
   };
 
   return (
@@ -77,7 +84,7 @@ export default function ContactPage() {
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
               Contact
-              <span className="bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent">
+              <span className="text-black">
                 {' '}Us
               </span>
             </h1>
@@ -94,9 +101,9 @@ export default function ContactPage() {
           {/* Contact Form */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-              <div className="bg-gradient-to-r from-teal-600 to-blue-600 px-8 py-6">
+              <div className="bg-black px-8 py-6">
                 <h2 className="text-2xl font-bold text-white">Send us a Message</h2>
-                <p className="text-teal-100 mt-2">We'll respond within 24 hours</p>
+                <p className="text-gray-300 mt-2">We'll respond within 24 hours</p>
               </div>
 
               <form onSubmit={handleSubmit} className="p-8 space-y-6">
@@ -201,7 +208,7 @@ export default function ContactPage() {
                     className={`px-8 py-3 rounded-lg font-medium transition-all duration-200 ${
                       isSubmitting
                         ? 'bg-gray-400 text-white cursor-not-allowed'
-                        : 'bg-gradient-to-r from-teal-600 to-blue-600 text-white hover:from-teal-700 hover:to-blue-700 shadow-lg'
+                        : 'bg-black text-white hover:bg-gray-800 shadow-lg'
                     }`}
                   >
                     {isSubmitting ? 'Sending...' : 'Send Message'}
@@ -236,7 +243,7 @@ export default function ContactPage() {
                       <p className="text-red-800 font-medium">Failed to send message</p>
                     </div>
                     <p className="text-red-700 text-sm mt-1">
-                      Please try again. If the problem persists, try reaching out to us directly.
+                      {errorMessage || 'Please try again. If the problem persists, try reaching out to us directly.'}
                     </p>
                   </div>
                 </div>
@@ -339,3 +346,4 @@ export default function ContactPage() {
     </div>
   );
 }
+

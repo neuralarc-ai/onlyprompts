@@ -17,7 +17,7 @@ export default function MyPromptsPage() {
     lastUpdate: null as string | null,
   });
   const [userPrompts, setUserPrompts] = useState([]);
-  const [sortBy, setSortBy] = useState<'recent' | 'liked'>('liked');
+  const [sortBy, setSortBy] = useState<'liked'>('liked');
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -67,7 +67,7 @@ export default function MyPromptsPage() {
         .from('prompts')
         .select('*')
         .eq('user_id', user.id)
-        .order(sortBy === 'recent' ? 'updated_at' : 'likes', { ascending: false });
+        .order('likes', { ascending: false });
 
       if (error) throw error;
       setUserPrompts(data || []);
@@ -78,7 +78,7 @@ export default function MyPromptsPage() {
 
   useEffect(() => {
     fetchUserPrompts();
-  }, [sortBy, user]);
+  }, [user]);
 
   if (authLoading) {
     return (
@@ -97,8 +97,21 @@ export default function MyPromptsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">My Prompts</h1>
-          <p className="text-gray-600 dark:text-gray-400">Manage your prompt library and track your contributions</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">My Prompts</h1>
+              <p className="text-gray-600 dark:text-gray-400">Manage your prompt library and track your contributions</p>
+            </div>
+            <button
+              onClick={() => router.push('/')}
+              className="flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              <span>Back to Home</span>
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -150,22 +163,7 @@ export default function MyPromptsPage() {
                     </div>
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => setSortBy('recent')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                          sortBy === 'recent'
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500'
-                        }`}
-                      >
-                        Recently updated
-                      </button>
-                      <button
-                        onClick={() => setSortBy('liked')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                          sortBy === 'liked'
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500'
-                        }`}
+                        className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white"
                       >
                         Most liked
                       </button>
@@ -175,26 +173,19 @@ export default function MyPromptsPage() {
                   <div className="space-y-4">
                     {userPrompts.map((prompt: any) => (
                       <div key={prompt.id} className="p-4 rounded-xl border bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h3 className="font-semibold mb-2">{prompt.title}</h3>
-                            <p className="text-sm mb-3 text-gray-600 dark:text-gray-300">
-                              {prompt.description}
-                            </p>
-                            <div className="flex items-center space-x-4 text-sm text-gray-500">
-                              <span className="flex items-center">
-                                <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                </svg>
-                                {prompt.likes} likes
-                              </span>
-                              <span>{new Date(prompt.created_at).toLocaleDateString()}</span>
-                            </div>
-                          </div>
-                          <div className="ml-4">
-                            <button className="px-3 py-1 rounded-lg text-sm bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500">
-                              Edit
-                            </button>
+                        <div>
+                          <h3 className="font-semibold mb-2">{prompt.title}</h3>
+                          <p className="text-sm mb-3 text-gray-600 dark:text-gray-300">
+                            {prompt.description}
+                          </p>
+                          <div className="flex items-center space-x-4 text-sm text-gray-500">
+                            <span className="flex items-center">
+                              <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                              </svg>
+                              {prompt.likes} likes
+                            </span>
+                            <span>{new Date(prompt.created_at).toLocaleDateString()}</span>
                           </div>
                         </div>
                       </div>

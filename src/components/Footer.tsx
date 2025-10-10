@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Logo from './Logo';
 
 export default function Footer() {
   return (
@@ -8,8 +9,8 @@ export default function Footer() {
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
             <Link href="/" className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">N</span>
+              <div className="w-8 h-8 flex items-center justify-center">
+                <Logo className="" size="sm" />
               </div>
               <span className="text-xl font-bold text-gray-900">NanoB</span>
             </Link>
@@ -49,6 +50,11 @@ export default function Footer() {
               <li>
                 <Link href="/categories" className="text-gray-600 hover:text-gray-900 transition-colors">
                   Categories
+                </Link>
+              </li>
+              <li>
+                <Link href="/users" className="text-gray-600 hover:text-gray-900 transition-colors">
+                  Users
                 </Link>
               </li>
               <li>
@@ -103,3 +109,4 @@ export default function Footer() {
     </footer>
   );
 }
+

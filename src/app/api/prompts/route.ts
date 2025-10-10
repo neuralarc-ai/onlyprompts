@@ -42,22 +42,41 @@ export async function POST(request: NextRequest) {
       ? authHeader.slice('Bearer '.length)
       : null
 
+    console.log('API POST request received');
+    console.log('Auth header present:', !!authHeader);
+    console.log('Token present:', !!token);
+    console.log('Request body keys:', Object.keys(body));
+
     if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      console.error('No authorization token provided')
+      return NextResponse.json({ error: 'No authorization token provided' }, { status: 401 })
     }
 
-    // Verify the token using a server-side client bound to this token
+    // Verify the token using the service role client
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-    const client = createClient(supabaseUrl, token, {
-      global: { headers: { Authorization: `Bearer ${token}` } },
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+    
+    if (!serviceRoleKey) {
+      console.error('SUPABASE_SERVICE_ROLE_KEY not configured')
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+    }
+
+    // Use service role client to verify the user token
+    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
       auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false },
     })
 
-    const { data: userRes } = await client.auth.getUser()
-    const authedUser = userRes?.user
+    // Verify the JWT token
+    const { data: { user: authedUser }, error: authError } = await supabaseAdmin.auth.getUser(token)
+
+    if (authError) {
+      console.error('Token verification error:', authError)
+      return NextResponse.json({ error: 'Invalid token: ' + authError.message }, { status: 401 })
+    }
 
     if (!authedUser) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      console.error('No user found for token')
+      return NextResponse.json({ error: 'User not found' }, { status: 401 })
     }
     
     // Validate required fields

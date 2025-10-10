@@ -40,17 +40,24 @@ export default function PromptCard({
   const { toggleLike, isLiked: userLiked } = useLikes(userId);
 
   const handleLike = async () => {
+    console.log('PromptCard - handleLike called:', { id, userId, currentLikes: likeCount });
+    
     if (!userId) {
       // Redirect to login or show auth modal
-      console.log('Please log in to like prompts');
+      console.log('PromptCard - User not authenticated, cannot like');
       return;
     }
 
+    console.log('PromptCard - Calling toggleLike...');
     const success = await toggleLike(id);
+    console.log('PromptCard - toggleLike result:', success);
+    
     if (success) {
       setLikeCount(prev => prev + 1);
+      console.log('PromptCard - Like count incremented');
     } else {
       setLikeCount(prev => Math.max(0, prev - 1));
+      console.log('PromptCard - Like count decremented');
     }
   };
 
@@ -167,7 +174,7 @@ export default function PromptCard({
               }}
               className={`flex items-center space-x-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 userLiked(id)
-                  ? 'bg-red-100 text-red-600' 
+                  ? 'bg-black text-white' 
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -194,7 +201,7 @@ export default function PromptCard({
               }}
               className={`flex items-center space-x-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 isCopied 
-                  ? 'bg-green-100 text-green-600' 
+                  ? 'bg-black text-white' 
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >

@@ -224,3 +224,5 @@ tail -f .next/cache/turbopack.log
 - Monitor your API usage in the Supabase dashboard
 
 For more help, check the [Supabase Documentation](https://supabase.com/docs).
+
+

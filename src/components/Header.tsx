@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/contexts/ThemeContext';
 import AuthModal from './AuthModal';
+import Logo from './Logo';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -13,13 +14,14 @@ export default function Header() {
   const { isDark, toggleTheme } = useTheme();
 
   return (
-    <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
+    <header className="py-4">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border border-gray-200 dark:border-gray-700 rounded-full px-6 py-3 shadow-lg">
+          <div className="flex justify-between items-center h-12">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">N</span>
+            <div className="w-8 h-8 flex items-center justify-center">
+              <Logo className="" size="sm" />
             </div>
             <span className="text-xl font-bold text-gray-900 dark:text-white">NanoB</span>
           </Link>
@@ -34,6 +36,9 @@ export default function Header() {
             </Link>
             <Link href="/categories" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
               Categories
+            </Link>
+            <Link href="/users" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
+              Users
             </Link>
             {user && (
               <Link href="/my-prompts" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
@@ -67,7 +72,7 @@ export default function Header() {
             {user ? (
               <div className="flex items-center space-x-3">
                 <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center">
                     <span className="text-white font-medium text-sm">
                       {user.email?.charAt(0).toUpperCase()}
                     </span>
@@ -81,17 +86,25 @@ export default function Header() {
                     </span>
                   </div>
                 </div>
-                <button
-                  onClick={signOut}
-                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors text-sm px-3 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
-                >
-                  Sign Out
-                </button>
+                <div className="flex items-center space-x-2">
+                  <Link
+                    href="/profile/settings"
+                    className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors text-sm px-3 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
+                    Settings
+                  </Link>
+                  <button
+                    onClick={signOut}
+                    className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors text-sm px-3 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
+                    Sign Out
+                  </button>
+                </div>
               </div>
             ) : (
               <button
                 onClick={() => setShowAuthModal(true)}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-xl"
+                className="bg-black text-white px-6 py-2 rounded-xl hover:bg-gray-800 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-xl"
               >
                 Sign In
               </button>
@@ -114,6 +127,7 @@ export default function Header() {
               />
             </svg>
           </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}
@@ -140,6 +154,13 @@ export default function Header() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Categories
+              </Link>
+              <Link
+                href="/users"
+                className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Users
               </Link>
               {user && (
                 <Link
@@ -183,7 +204,7 @@ export default function Header() {
                 {user ? (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                      <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center">
                         <span className="text-white font-medium text-sm">
                           {user.email?.charAt(0).toUpperCase()}
                         </span>
@@ -197,12 +218,21 @@ export default function Header() {
                         </div>
                       </div>
                     </div>
-                    <button
-                      onClick={signOut}
-                      className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 px-3 py-1 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                    >
-                      Sign Out
-                    </button>
+                    <div className="flex items-center space-x-2">
+                      <Link
+                        href="/profile/settings"
+                        className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 px-3 py-1 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Settings
+                      </Link>
+                      <button
+                        onClick={signOut}
+                        className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 px-3 py-1 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                      >
+                        Sign Out
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <button
@@ -210,7 +240,7 @@ export default function Header() {
                       setShowAuthModal(true);
                       setIsMenuOpen(false);
                     }}
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 text-sm font-medium shadow-lg"
+                    className="w-full bg-black text-white py-3 px-4 rounded-xl hover:bg-gray-800 transition-all duration-200 text-sm font-medium shadow-lg"
                   >
                     Sign In
                   </button>

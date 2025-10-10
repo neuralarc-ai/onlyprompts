@@ -75,7 +75,7 @@ export default function HelpPage() {
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
               Help &
-              <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+              <span className="text-black">
                 {' '}FAQ
               </span>
             </h1>
@@ -215,15 +215,15 @@ export default function HelpPage() {
 
         {/* Contact Support */}
         <section className="text-center">
-          <div className="bg-gradient-to-r from-orange-600 to-red-600 rounded-2xl p-8 text-white">
+          <div className="bg-black rounded-2xl p-8 text-white">
             <h2 className="text-3xl font-bold mb-4">Still Need Help?</h2>
-            <p className="text-orange-100 mb-6 max-w-2xl mx-auto">
+            <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
               Can't find what you're looking for? Our support team is here to help you get the most out of NanoB.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a 
                 href="/contact" 
-                className="inline-flex items-center px-6 py-3 bg-white text-orange-600 rounded-lg hover:bg-gray-100 transition-all duration-200 font-medium"
+                className="inline-flex items-center px-6 py-3 bg-white text-black rounded-lg hover:bg-gray-100 transition-all duration-200 font-medium"
               >
                 Contact Support
               </a>
@@ -242,3 +242,4 @@ export default function HelpPage() {
     </div>
   );
 }
+

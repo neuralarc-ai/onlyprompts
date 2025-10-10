@@ -72,7 +72,11 @@ export default function SubmitPage() {
       const { data: sessionData } = await supabase.auth.getSession();
       const accessToken = sessionData.session?.access_token;
 
+      console.log('Session data:', sessionData);
+      console.log('Access token:', accessToken ? 'Present' : 'Missing');
+
       if (!accessToken) {
+        console.error('No access token found in session');
         router.push('/');
         throw new Error('Missing access token');
       }
@@ -96,7 +100,9 @@ export default function SubmitPage() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to submit prompt');
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || `HTTP ${response.status}: ${response.statusText}`;
+        throw new Error(`Failed to submit prompt: ${errorMessage}`);
       }
 
       const result = await response.json();
@@ -125,7 +131,7 @@ export default function SubmitPage() {
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
               Submit Your
-              <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-black">
                 {' '}Prompt
               </span>
             </h1>
@@ -138,9 +144,9 @@ export default function SubmitPage() {
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6">
+          <div className="bg-black px-8 py-6">
             <h2 className="text-2xl font-bold text-white">Share Your Prompt</h2>
-            <p className="text-indigo-100 mt-2">Fill out the form below to submit your AI prompt</p>
+            <p className="text-gray-300 mt-2">Fill out the form below to submit your AI prompt</p>
           </div>
 
           <form onSubmit={handleSubmit} className="p-8 space-y-6">
@@ -282,7 +288,7 @@ export default function SubmitPage() {
                 className={`px-8 py-3 rounded-lg font-medium transition-all duration-200 ${
                   isSubmitting
                     ? 'bg-gray-400 text-white cursor-not-allowed'
-                    : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 shadow-lg'
+                    : 'bg-black text-white hover:bg-gray-800 shadow-lg'
                 }`}
               >
                 {isSubmitting ? 'Submitting...' : 'Submit Prompt'}

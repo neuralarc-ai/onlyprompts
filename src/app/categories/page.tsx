@@ -60,7 +60,7 @@ export default function CategoriesPage() {
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
               Browse by
-              <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+              <span className="text-black">
                 {' '}Category
               </span>
             </h1>
@@ -80,8 +80,8 @@ export default function CategoriesPage() {
               onClick={() => setSelectedCategory(category.name)}
               className={`p-6 rounded-xl border-2 transition-all duration-200 text-left ${
                 selectedCategory === category.name
-                  ? 'border-green-500 bg-green-50 shadow-lg'
-                  : 'border-gray-200 bg-white hover:border-green-300 hover:shadow-md'
+                  ? 'border-black bg-gray-50 shadow-lg'
+                  : 'border-gray-200 bg-white hover:border-gray-400 hover:shadow-md'
               }`}
             >
               <div className="text-4xl mb-3">{category.icon}</div>
@@ -96,7 +96,7 @@ export default function CategoriesPage() {
                   {category.count} prompts
                 </span>
                 {selectedCategory === category.name && (
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <div className="w-2 h-2 bg-black rounded-full"></div>
                 )}
               </div>
             </button>
@@ -183,3 +183,4 @@ export default function CategoriesPage() {
     </div>
   );
 }
+

@@ -12,7 +12,7 @@ export default function AboutPage() {
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
               About
-              <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+              <span className="text-black">
                 {' '}NanoB
               </span>
             </h1>
@@ -69,24 +69,24 @@ export default function AboutPage() {
 
         {/* Stats */}
         <section className="mb-16">
-          <div className="bg-gradient-to-r from-blue-600 to-cyan-600 rounded-2xl p-8 text-white">
+          <div className="bg-black rounded-2xl p-8 text-white">
             <h2 className="text-3xl font-bold mb-8 text-center">Our Impact</h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
               <div>
                 <div className="text-4xl font-bold mb-2">10K+</div>
-                <div className="text-blue-100">AI Prompts</div>
+                <div className="text-gray-300">AI Prompts</div>
               </div>
               <div>
                 <div className="text-4xl font-bold mb-2">5K+</div>
-                <div className="text-blue-100">Active Users</div>
+                <div className="text-gray-300">Active Users</div>
               </div>
               <div>
                 <div className="text-4xl font-bold mb-2">50+</div>
-                <div className="text-blue-100">Categories</div>
+                <div className="text-gray-300">Categories</div>
               </div>
               <div>
                 <div className="text-4xl font-bold mb-2">100K+</div>
-                <div className="text-blue-100">Monthly Views</div>
+                <div className="text-gray-300">Monthly Views</div>
               </div>
             </div>
           </div>
@@ -106,7 +106,7 @@ export default function AboutPage() {
               </p>
               <a 
                 href="/contact" 
-                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-lg hover:from-blue-700 hover:to-cyan-700 transition-all duration-200 font-medium"
+                className="inline-flex items-center px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-all duration-200 font-medium"
               >
                 Get in Touch
               </a>
@@ -143,7 +143,7 @@ export default function AboutPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a 
                 href="/contact" 
-                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-lg hover:from-blue-700 hover:to-cyan-700 transition-all duration-200 font-medium"
+                className="inline-flex items-center px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-all duration-200 font-medium"
               >
                 Contact Us
               </a>
@@ -162,3 +162,4 @@ export default function AboutPage() {
     </div>
   );
 }
+

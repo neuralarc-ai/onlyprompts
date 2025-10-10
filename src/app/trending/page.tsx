@@ -36,7 +36,7 @@ export default function TrendingPage() {
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
               Trending
-              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <span className="text-black">
                 {' '}Prompts
               </span>
             </h1>
@@ -102,7 +102,7 @@ export default function TrendingPage() {
 
         {/* Load More Button */}
         <div className="text-center mt-12">
-          <button className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-200 font-medium shadow-lg">
+          <button className="bg-black text-white px-8 py-3 rounded-xl hover:bg-gray-800 transition-all duration-200 font-medium shadow-lg">
             Load More Trending
           </button>
         </div>
@@ -119,3 +119,4 @@ export default function TrendingPage() {
     </div>
   );
 }
+

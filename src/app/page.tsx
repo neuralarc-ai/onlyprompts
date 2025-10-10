@@ -57,7 +57,7 @@ export default function Home() {
       <Header />
       <Hero />
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <CategoryFilter 
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
@@ -100,7 +100,7 @@ export default function Home() {
             <div className="text-red-500 mb-4">Error: {error}</div>
             <button
               onClick={refresh}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+              className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors"
             >
               Try Again
             </button>
@@ -147,7 +147,7 @@ export default function Home() {
                 setSearchQuery('');
                 setSelectedCategory('All');
               }}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium"
+              className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-all duration-200 font-medium"
             >
               Browse All Prompts
             </button>

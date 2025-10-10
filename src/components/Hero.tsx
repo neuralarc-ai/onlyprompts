@@ -1,24 +1,36 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Hero() {
   const [searchQuery, setSearchQuery] = useState('');
+  const router = useRouter();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle search functionality
-    console.log('Searching for:', searchQuery);
+    if (searchQuery.trim()) {
+      // Navigate to homepage with search query
+      router.push(`/?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  const handleExplorePrompts = () => {
+    // Scroll to the prompts section
+    const promptsSection = document.querySelector('main');
+    if (promptsSection) {
+      promptsSection.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
-    <section className="bg-gradient-to-br from-blue-50 via-white to-purple-50 py-20">
+    <section className="bg-gradient-to-br from-blue-50 via-white to-purple-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           {/* Main Heading */}
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
             Discover Amazing
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="text-black">
               {' '}AI Prompts
             </span>
           </h1>
@@ -54,7 +66,7 @@ export default function Hero() {
               </svg>
               <button
                 type="submit"
-                className="absolute right-2 top-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium"
+                className="absolute right-2 top-2 bg-black text-white px-6 py-2 rounded-xl hover:bg-gray-800 transition-all duration-200 font-medium"
               >
                 Search
               </button>
@@ -62,28 +74,28 @@ export default function Hero() {
           </form>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <div className="flex justify-center items-center space-x-12 max-w-2xl mx-auto mb-8">
             <div className="text-center">
-              <div className="text-3xl font-bold text-gray-900 mb-2">10K+</div>
-              <div className="text-gray-600">AI Prompts</div>
+              <div className="text-3xl font-bold text-gray-900 mb-1">10K+</div>
+              <div className="text-gray-600 text-sm">AI Prompts</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-gray-900 mb-2">5K+</div>
-              <div className="text-gray-600">Creators</div>
+              <div className="text-3xl font-bold text-gray-900 mb-1">5K+</div>
+              <div className="text-gray-600 text-sm">Creators</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-gray-900 mb-2">50+</div>
-              <div className="text-gray-600">Categories</div>
+              <div className="text-3xl font-bold text-gray-900 mb-1">50+</div>
+              <div className="text-gray-600 text-sm">Categories</div>
             </div>
           </div>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
-            <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium shadow-lg">
+          {/* CTA Button */}
+          <div className="flex justify-center mt-6">
+            <button 
+              onClick={handleExplorePrompts}
+              className="bg-black text-white px-8 py-3 rounded-xl hover:bg-gray-800 transition-all duration-200 font-medium shadow-lg"
+            >
               Explore Prompts
-            </button>
-            <button className="border border-gray-300 text-gray-700 px-8 py-3 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium">
-              Submit Your Prompt
             </button>
           </div>
         </div>
@@ -91,3 +103,4 @@ export default function Hero() {
     </section>
   );
 }
+
