@@ -163,7 +163,7 @@ export default function SubmitPage() {
                 onChange={handleInputChange}
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                placeholder="e.g., Cyberpunk Cityscape"
+                placeholder="e.g., Professional LinkedIn Post"
               />
             </div>
 

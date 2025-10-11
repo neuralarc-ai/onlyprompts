@@ -82,9 +82,9 @@ export async function POST(request: NextRequest) {
     if (action === 'like') {
       // Insert like (id is UUID by default in schema); ignore duplicates
       console.log('Inserting like:', { promptId, userId })
-      const { data: insertData, error: insertError } = await supabaseAdmin
+      const { data: insertData, error: insertError } = await (supabaseAdmin as any)
         .from('likes')
-        .insert([{ prompt_id: promptId, user_id: userId }])
+        .insert({ prompt_id: promptId, user_id: userId })
         .select()
       
       if (insertError && insertError.code !== '23505') {
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
     } else {
       // Remove like
       console.log('Removing like:', { promptId, userId })
-      const { data: deleteData, error: deleteError } = await supabaseAdmin
+      const { data: deleteData, error: deleteError } = await (supabaseAdmin as any)
         .from('likes')
         .delete()
         .eq('prompt_id', promptId)
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
 
     // Recalculate like count for the prompt and persist on parent row
     console.log('Recalculating like count for prompt:', promptId)
-    const { count: likeCount, error: countError } = await supabaseAdmin
+    const { count: likeCount, error: countError } = await (supabaseAdmin as any)
       .from('likes')
       .select('*', { count: 'exact', head: true })
       .eq('prompt_id', promptId)
@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
     console.log('Like count calculated:', likeCount)
 
     // Update the prompt's like count
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await (supabaseAdmin as any)
       .from('prompts')
       .update({ likes: likeCount || 0 })
       .eq('id', promptId)
@@ -177,7 +177,7 @@ export async function GET(request: NextRequest) {
     if (promptId) {
       // Check if specific prompt is liked
       console.log('Likes API - Checking if specific prompt is liked:', { promptId, userId });
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await (supabaseAdmin as any)
         .from('likes')
         .select('id')
         .eq('prompt_id', promptId)
@@ -194,7 +194,7 @@ export async function GET(request: NextRequest) {
     } else {
       // Get all user likes
       console.log('Likes API - Fetching all user likes:', { userId });
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await (supabaseAdmin as any)
         .from('likes')
         .select('prompt_id')
         .eq('user_id', userId)
@@ -204,7 +204,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'Failed to fetch likes' }, { status: 500 })
       }
 
-      const likes = data.map(like => like.prompt_id)
+      const likes = data.map((like: any) => like.prompt_id)
       console.log('Likes API - User likes result:', { likes });
       return NextResponse.json({ likes })
     }

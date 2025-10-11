@@ -1,7 +1,11 @@
+'use client';
+
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { useStats } from '@/hooks/useStats';
 
 export default function AboutPage() {
+  const { stats, loading, formatNumber } = useStats();
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -73,15 +77,21 @@ export default function AboutPage() {
             <h2 className="text-3xl font-bold mb-8 text-center">Our Impact</h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
               <div>
-                <div className="text-4xl font-bold mb-2">10K+</div>
+                <div className="text-4xl font-bold mb-2">
+                  {loading ? '...' : formatNumber(stats.prompts)}
+                </div>
                 <div className="text-gray-300">AI Prompts</div>
               </div>
               <div>
-                <div className="text-4xl font-bold mb-2">5K+</div>
+                <div className="text-4xl font-bold mb-2">
+                  {loading ? '...' : formatNumber(stats.creators)}
+                </div>
                 <div className="text-gray-300">Active Users</div>
               </div>
               <div>
-                <div className="text-4xl font-bold mb-2">50+</div>
+                <div className="text-4xl font-bold mb-2">
+                  {loading ? '...' : formatNumber(stats.categories)}
+                </div>
                 <div className="text-gray-300">Categories</div>
               </div>
               <div>

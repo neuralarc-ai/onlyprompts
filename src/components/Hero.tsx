@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useStats } from '@/hooks/useStats';
 
 export default function Hero() {
   const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
+  const { stats, loading, formatNumber } = useStats();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,15 +78,21 @@ export default function Hero() {
           {/* Stats */}
           <div className="flex justify-center items-center space-x-12 max-w-2xl mx-auto mb-8">
             <div className="text-center">
-              <div className="text-3xl font-bold text-gray-900 mb-1">10K+</div>
+              <div className="text-3xl font-bold text-gray-900 mb-1">
+                {loading ? '...' : formatNumber(stats.prompts)}
+              </div>
               <div className="text-gray-600 text-sm">AI Prompts</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-gray-900 mb-1">5K+</div>
+              <div className="text-3xl font-bold text-gray-900 mb-1">
+                {loading ? '...' : formatNumber(stats.creators)}
+              </div>
               <div className="text-gray-600 text-sm">Creators</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-gray-900 mb-1">50+</div>
+              <div className="text-3xl font-bold text-gray-900 mb-1">
+                {loading ? '...' : formatNumber(stats.categories)}
+              </div>
               <div className="text-gray-600 text-sm">Categories</div>
             </div>
           </div>

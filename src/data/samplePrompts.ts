@@ -13,17 +13,6 @@ export interface Prompt {
 export const samplePrompts: Prompt[] = [
   {
     id: '1',
-    title: 'Cyberpunk Cityscape',
-    description: 'A stunning futuristic city with neon lights and flying cars',
-    prompt: 'A cyberpunk cityscape at night, neon lights reflecting on wet streets, flying cars in the sky, tall buildings with holographic advertisements, dark atmosphere with bright colorful accents, highly detailed, 4K resolution',
-    imageUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=500&h=300&fit=crop',
-    author: 'Alex Chen',
-    likes: 1247,
-    category: 'Art & Design',
-    createdAt: '2024-01-15'
-  },
-  {
-    id: '2',
     title: 'Professional LinkedIn Post',
     description: 'Generate engaging professional content for LinkedIn',
     prompt: 'Write a professional LinkedIn post about [topic] that includes: a compelling hook in the first line, 3-4 key points with actionable insights, relevant industry statistics, a call-to-action, and professional but engaging tone. Keep it under 1500 characters.',
@@ -34,7 +23,7 @@ export const samplePrompts: Prompt[] = [
     createdAt: '2024-01-14'
   },
   {
-    id: '3',
+    id: '2',
     title: 'Fantasy Dragon Portrait',
     description: 'Majestic dragon with intricate details and magical aura',
     prompt: 'A majestic fantasy dragon portrait, ancient and wise looking, intricate scales with metallic reflections, glowing eyes, magical aura surrounding it, detailed facial features, fantasy art style, high contrast lighting, 8K resolution',
@@ -45,7 +34,7 @@ export const samplePrompts: Prompt[] = [
     createdAt: '2024-01-13'
   },
   {
-    id: '4',
+    id: '3',
     title: 'React Component Generator',
     description: 'Generate clean, reusable React components with TypeScript',
     prompt: 'Generate a React component with TypeScript for [component name] that includes: proper TypeScript interfaces, clean JSX structure, responsive design with Tailwind CSS, accessibility features (ARIA labels, keyboard navigation), error handling, loading states, and comprehensive prop types. Include usage examples.',
@@ -56,7 +45,7 @@ export const samplePrompts: Prompt[] = [
     createdAt: '2024-01-12'
   },
   {
-    id: '5',
+    id: '4',
     title: 'Product Photography Setup',
     description: 'Professional product photography lighting and composition',
     prompt: 'Create a professional product photography setup for [product type] with: soft, diffused lighting to eliminate harsh shadows, clean white background, proper depth of field, rule of thirds composition, multiple angles (front, side, detail shots), minimal and elegant styling, commercial photography quality',
@@ -67,7 +56,7 @@ export const samplePrompts: Prompt[] = [
     createdAt: '2024-01-11'
   },
   {
-    id: '6',
+    id: '5',
     title: 'Creative Writing Exercise',
     description: 'Spark creativity with unique writing prompts and exercises',
     prompt: 'Create a creative writing exercise that helps writers: develop unique character voices, explore unconventional narrative structures, practice dialogue writing, experiment with different genres, overcome writer\'s block, and improve descriptive writing. Include specific examples and step-by-step instructions.',
@@ -78,7 +67,7 @@ export const samplePrompts: Prompt[] = [
     createdAt: '2024-01-10'
   },
   {
-    id: '7',
+    id: '6',
     title: 'Social Media Content Calendar',
     description: 'Plan and organize social media content strategy',
     prompt: 'Create a comprehensive social media content calendar for [business type] including: content themes for each day of the week, optimal posting times for different platforms, content mix (educational, promotional, entertaining), hashtag strategies, engagement tactics, and metrics to track. Plan for one month.',
@@ -89,7 +78,7 @@ export const samplePrompts: Prompt[] = [
     createdAt: '2024-01-09'
   },
   {
-    id: '8',
+    id: '7',
     title: 'Minimalist Logo Design',
     description: 'Clean and modern logo design principles',
     prompt: 'Design a minimalist logo for [company name] that embodies: clean lines and simple shapes, timeless appeal, scalability for different sizes, strong brand recognition, appropriate color psychology, versatility across different media, and modern aesthetic. Focus on simplicity and memorability.',
@@ -100,5 +89,7 @@ export const samplePrompts: Prompt[] = [
     createdAt: '2024-01-08'
   }
 ];
+
+
 
 

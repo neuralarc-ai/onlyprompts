@@ -160,3 +160,4 @@ Your NanoB application now has:
 Just follow the setup guide in `SUPABASE_SETUP.md` and you'll have a fully functional, real-time AI prompt sharing platform! 🚀
 
 
+

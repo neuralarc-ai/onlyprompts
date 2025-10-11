@@ -4,10 +4,11 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const prompt = await DatabaseService.getPromptById(params.id)
+    const { id } = await params
+    const prompt = await DatabaseService.getPromptById(id)
     return NextResponse.json(prompt)
   } catch (error) {
     console.error('Error fetching prompt:', error)
@@ -20,9 +21,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
 
     const { data, error } = await supabaseAdmin
@@ -44,7 +46,7 @@ export async function PUT(
           : [],
         updated_at: new Date().toISOString(),
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single()
 
@@ -65,13 +67,14 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const { error } = await supabaseAdmin
       .from('prompts')
       .delete()
-      .eq('id', params.id)
+      .eq('id', id)
 
     if (error) {
       console.error('Supabase delete error:', error)
