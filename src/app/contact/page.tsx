@@ -89,8 +89,8 @@ export default function ContactPage() {
               </span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Have questions, suggestions, or need help? We'd love to hear from you. 
-              Get in touch with our team and we'll get back to you as soon as possible.
+              Have questions, suggestions, or need help? We&apos;d love to hear from you. 
+              Get in touch with our team and we&apos;ll get back to you as soon as possible.
             </p>
           </div>
         </div>
@@ -103,7 +103,7 @@ export default function ContactPage() {
             <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
               <div className="bg-black px-8 py-6">
                 <h2 className="text-2xl font-bold text-white">Send us a Message</h2>
-                <p className="text-gray-300 mt-2">We'll respond within 24 hours</p>
+                <p className="text-gray-300 mt-2">We&apos;ll respond within 24 hours</p>
               </div>
 
               <form onSubmit={handleSubmit} className="p-8 space-y-6">
@@ -227,7 +227,7 @@ export default function ContactPage() {
                       <p className="text-green-800 font-medium">Message sent successfully!</p>
                     </div>
                     <p className="text-green-700 text-sm mt-1">
-                      Thank you for contacting us. We'll get back to you within 24 hours.
+                      Thank you for contacting us. We&apos;ll get back to you within 24 hours.
                     </p>
                   </div>
                 </div>

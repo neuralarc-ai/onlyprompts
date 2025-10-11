@@ -21,7 +21,7 @@ export default function AboutPage() {
               </span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              We're building the world's largest community-driven platform for AI prompts, 
+              We&apos;re building the world&apos;s largest community-driven platform for AI prompts, 
               where creativity meets artificial intelligence.
             </p>
           </div>
@@ -148,7 +148,7 @@ export default function AboutPage() {
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Get Involved</h2>
             <p className="text-lg text-gray-600 mb-6 max-w-2xl mx-auto">
               Have questions, suggestions, or want to contribute to NanoB? 
-              We'd love to hear from you!
+              We&apos;d love to hear from you!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a 

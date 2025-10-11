@@ -5,7 +5,21 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PromptCard from '@/components/PromptCard';
 import PromptModal from '@/components/PromptModal';
-import { samplePrompts, Prompt } from '@/data/samplePrompts';
+import { samplePrompts } from '@/data/samplePrompts';
+
+interface Prompt {
+  id: string;
+  title: string;
+  description: string;
+  prompt: string;
+  image_url: string;
+  author: string;
+  likes: number;
+  category: string;
+  created_at: string;
+  updated_at: string;
+  tags: string[];
+}
 
 const categories = [
   { name: 'Art & Design', icon: '🎨', count: 0, description: 'Creative visual prompts for art and design' },
@@ -26,19 +40,36 @@ export default function CategoriesPage() {
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Transform sample prompts to match expected format
+  const transformedPrompts = useMemo(() => {
+    return samplePrompts.map(prompt => ({
+      id: prompt.id,
+      title: prompt.title,
+      description: prompt.description,
+      prompt: prompt.prompt,
+      image_url: prompt.imageUrl,
+      author: prompt.author,
+      likes: prompt.likes,
+      category: prompt.category,
+      created_at: prompt.createdAt,
+      updated_at: prompt.createdAt,
+      tags: []
+    }));
+  }, []);
+
   // Calculate category counts
   const categoriesWithCounts = useMemo(() => {
     return categories.map(category => ({
       ...category,
-      count: samplePrompts.filter(prompt => prompt.category === category.name).length
+      count: transformedPrompts.filter(prompt => prompt.category === category.name).length
     }));
-  }, []);
+  }, [transformedPrompts]);
 
   // Filter prompts by selected category
   const filteredPrompts = useMemo(() => {
     if (!selectedCategory) return [];
-    return samplePrompts.filter(prompt => prompt.category === selectedCategory);
-  }, [selectedCategory]);
+    return transformedPrompts.filter(prompt => prompt.category === selectedCategory);
+  }, [selectedCategory, transformedPrompts]);
 
   const handlePromptClick = (prompt: Prompt) => {
     setSelectedPrompt(prompt);
@@ -65,7 +96,7 @@ export default function CategoriesPage() {
               </span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Explore AI prompts organized by category. Find exactly what you're looking for, from creative arts to business applications.
+              Explore AI prompts organized by category. Find exactly what you&apos;re looking for, from creative arts to business applications.
             </p>
           </div>
         </div>
@@ -127,11 +158,11 @@ export default function CategoriesPage() {
                     title={prompt.title}
                     description={prompt.description}
                     prompt={prompt.prompt}
-                    imageUrl={prompt.imageUrl}
+                    imageUrl={prompt.image_url}
                     author={prompt.author}
                     likes={prompt.likes}
                     category={prompt.category}
-                    createdAt={prompt.createdAt}
+                    createdAt={prompt.created_at}
                     onClick={() => handlePromptClick(prompt)}
                   />
                 ))}
@@ -143,7 +174,7 @@ export default function CategoriesPage() {
                   No prompts found
                 </h3>
                 <p className="text-gray-600">
-                  We're working on adding more {selectedCategory.toLowerCase()} prompts.
+                  We&apos;re working on adding more {selectedCategory.toLowerCase()} prompts.
                 </p>
               </div>
             )}

@@ -47,7 +47,7 @@ export default function TermsPage() {
 
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Disclaimer</h2>
             <p className="text-gray-600 mb-6">
-              The materials on NanoB are provided on an 'as is' basis. NanoB makes no warranties, 
+              The materials on NanoB are provided on an &apos;as is&apos; basis. NanoB makes no warranties, 
               expressed or implied, and hereby disclaims and negates all other warranties.
             </p>
 

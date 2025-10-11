@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { DatabaseService } from '@/lib/database';
 import { supabase } from '@/lib/supabase';
 
 export function useLikes(userId?: string) {

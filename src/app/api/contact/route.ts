@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
       console.log('RLS error detected, trying with service role...');
       
       // Create a new client with service role key
-      const { createClient } = require('@supabase/supabase-js');
+      const { createClient } = await import('@supabase/supabase-js');
       const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
       
       if (serviceRoleKey) {

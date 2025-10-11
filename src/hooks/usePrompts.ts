@@ -12,7 +12,7 @@ interface UsePromptsOptions {
 }
 
 export function usePrompts(options: UsePromptsOptions = {}) {
-  const [prompts, setPrompts] = useState<any[]>([]);
+  const [prompts, setPrompts] = useState<{ id: string; title: string; description: string; prompt: string; likes: number; created_at: string; updated_at: string; category: string; tags: string[]; image_url: string; author: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
@@ -83,11 +83,11 @@ export function usePrompts(options: UsePromptsOptions = {}) {
         console.log('Real-time update:', payload);
         
         if (payload.eventType === 'INSERT') {
-          setPrompts(prev => [payload.new, ...prev]);
+          setPrompts(prev => [payload.new as any, ...prev]);
         } else if (payload.eventType === 'UPDATE') {
           setPrompts(prev => 
             prev.map(prompt => 
-              prompt.id === payload.new.id ? payload.new : prompt
+              prompt.id === payload.new.id ? payload.new as any : prompt
             )
           );
         } else if (payload.eventType === 'DELETE') {

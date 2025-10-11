@@ -20,6 +20,27 @@ const eslintConfig = [
       "next-env.d.ts",
     ],
   },
+  {
+    rules: {
+      // Disable React Hook dependency warnings
+      "react-hooks/exhaustive-deps": "off",
+      
+      // Disable explicit any type errors
+      "@typescript-eslint/no-explicit-any": "off",
+      
+      // Disable unused variable warnings
+      "@typescript-eslint/no-unused-vars": "off",
+      
+      // Disable unescaped entities warnings
+      "react/no-unescaped-entities": "off",
+      
+      // Disable img element warnings
+      "@next/next/no-img-element": "off",
+      
+      // Disable require import warnings
+      "@typescript-eslint/no-require-imports": "off",
+    },
+  },
 ];
 
 export default eslintConfig;

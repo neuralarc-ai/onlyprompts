@@ -218,7 +218,7 @@ export default function HelpPage() {
           <div className="bg-black rounded-2xl p-8 text-white">
             <h2 className="text-3xl font-bold mb-4">Still Need Help?</h2>
             <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-              Can't find what you're looking for? Our support team is here to help you get the most out of NanoB.
+              Can&apos;t find what you&apos;re looking for? Our support team is here to help you get the most out of NanoB.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a 

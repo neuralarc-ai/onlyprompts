@@ -48,8 +48,8 @@ export default function ResetPasswordPage() {
       setTimeout(() => {
         router.push('/');
       }, 2000);
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'An error occurred');
     } finally {
       setLoading(false);
     }

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { useProfile, useProfileStats } from '@/hooks/useProfile';
+import { useProfileStats } from '@/hooks/useProfile';
 import { useFollow } from '@/hooks/useFollow';
 import { useAuth } from '@/hooks/useAuth';
 import Header from '@/components/Header';
@@ -18,7 +18,7 @@ export default function ProfilePage() {
   const params = useParams();
   const username = params.username as string;
   const { user } = useAuth();
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<{ id: string; username: string; full_name: string | null; avatar_url: string | null; bio: string | null; website: string | null; location: string | null; created_at: string; updated_at: string } | null>(null);
   const [userPrompts, setUserPrompts] = useState<Prompt[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
@@ -116,7 +116,7 @@ export default function ProfilePage() {
         <Header />
         <div className="text-center py-12">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">User not found</h1>
-          <p className="text-gray-600">The user you're looking for doesn't exist.</p>
+          <p className="text-gray-600">The user you&apos;re looking for doesn&apos;t exist.</p>
         </div>
         <Footer />
       </div>

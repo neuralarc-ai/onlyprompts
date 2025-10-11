@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     console.log('Testing contact_messages table...');
     
     // Test 1: Check if table exists by trying to select
-    const { data: selectData, error: selectError } = await supabase
+    const { error: selectError } = await supabase
       .from('contact_messages')
       .select('*')
       .limit(1);
@@ -69,12 +69,12 @@ export async function GET(request: NextRequest) {
       insertData: insertData
     });
 
-  } catch (error: any) {
+    } catch (error) {
     console.error('Test error:', error);
     return NextResponse.json({
       success: false,
       error: 'Test failed',
-      details: error.message
+      details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 });
   }
 }

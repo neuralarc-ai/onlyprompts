@@ -150,10 +150,8 @@ export async function GET(request: NextRequest) {
     console.log('Likes API - GET request received');
     
     // Check environment variables
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     console.log('Likes API - Environment check:', { 
-      hasSupabaseUrl: !!supabaseUrl, 
       hasServiceRoleKey: !!serviceRoleKey 
     });
     

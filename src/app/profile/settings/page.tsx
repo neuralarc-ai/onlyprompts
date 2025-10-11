@@ -6,9 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import type { Database } from '@/lib/supabase';
 
-type Profile = Database['public']['Tables']['user_profiles']['Row'];
 
 export default function ProfileSettingsPage() {
   const { user } = useAuth();
@@ -102,8 +100,8 @@ export default function ProfileSettingsPage() {
         }));
         setSuccess('Avatar uploaded successfully!');
       }
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
     }
@@ -144,8 +142,8 @@ export default function ProfileSettingsPage() {
       } else {
         setError('Failed to update profile');
       }
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setSaving(false);
     }

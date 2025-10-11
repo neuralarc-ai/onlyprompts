@@ -5,16 +5,47 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PromptCard from '@/components/PromptCard';
 import PromptModal from '@/components/PromptModal';
-import { samplePrompts, Prompt } from '@/data/samplePrompts';
+import { samplePrompts } from '@/data/samplePrompts';
+
+interface Prompt {
+  id: string;
+  title: string;
+  description: string;
+  prompt: string;
+  image_url: string;
+  author: string;
+  likes: number;
+  category: string;
+  created_at: string;
+  updated_at: string;
+  tags: string[];
+}
 
 export default function TrendingPage() {
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Transform sample prompts to match expected format
+  const transformedPrompts = useMemo(() => {
+    return samplePrompts.map(prompt => ({
+      id: prompt.id,
+      title: prompt.title,
+      description: prompt.description,
+      prompt: prompt.prompt,
+      image_url: prompt.imageUrl,
+      author: prompt.author,
+      likes: prompt.likes,
+      category: prompt.category,
+      created_at: prompt.createdAt,
+      updated_at: prompt.createdAt,
+      tags: []
+    }));
+  }, []);
+
   // Sort prompts by likes (most popular first)
   const trendingPrompts = useMemo(() => {
-    return [...samplePrompts].sort((a, b) => b.likes - a.likes);
-  }, []);
+    return [...transformedPrompts].sort((a, b) => b.likes - a.likes);
+  }, [transformedPrompts]);
 
   const handlePromptClick = (prompt: Prompt) => {
     setSelectedPrompt(prompt);
@@ -41,7 +72,7 @@ export default function TrendingPage() {
               </span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Discover the most popular and trending AI prompts that are capturing the community's attention right now.
+              Discover the most popular and trending AI prompts that are capturing the community&apos;s attention right now.
             </p>
             
             {/* Trending Stats */}
@@ -89,11 +120,11 @@ export default function TrendingPage() {
                 title={prompt.title}
                 description={prompt.description}
                 prompt={prompt.prompt}
-                imageUrl={prompt.imageUrl}
+                imageUrl={prompt.image_url}
                 author={prompt.author}
                 likes={prompt.likes}
                 category={prompt.category}
-                createdAt={prompt.createdAt}
+                createdAt={prompt.created_at}
                 onClick={() => handlePromptClick(prompt)}
               />
             </div>

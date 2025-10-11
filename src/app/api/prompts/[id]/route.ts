@@ -27,25 +27,34 @@ export async function PUT(
     const { id } = await params
     const body = await request.json()
 
-    const { data, error } = await supabaseAdmin
+    // Build update data object with only defined values
+    const updates: Record<string, any> = {}
+    
+    if (body.title !== undefined) updates.title = body.title
+    if (body.description !== undefined) updates.description = body.description
+    if (body.prompt !== undefined) updates.prompt = body.prompt
+    if (body.imageUrl !== undefined || body.image_url !== undefined) {
+      updates.image_url = body.imageUrl || body.image_url
+    }
+    if (body.author !== undefined) updates.author = body.author
+    if (body.category !== undefined) updates.category = body.category
+    if (body.tags !== undefined) {
+      updates.tags = Array.isArray(body.tags)
+        ? body.tags
+        : body.tags
+        ? String(body.tags)
+            .split(',')
+            .map((tag: string) => tag.trim())
+            .filter((tag: string) => tag.length > 0)
+        : []
+    }
+    
+    // Always update the timestamp
+    updates.updated_at = new Date().toISOString()
+
+    const { data, error } = await (supabaseAdmin as any)
       .from('prompts')
-      .update({
-        title: body.title,
-        description: body.description,
-        prompt: body.prompt,
-        image_url: body.imageUrl || body.image_url,
-        author: body.author,
-        category: body.category,
-        tags: Array.isArray(body.tags)
-          ? body.tags
-          : body.tags
-          ? String(body.tags)
-              .split(',')
-              .map((tag: string) => tag.trim())
-              .filter((tag: string) => tag.length > 0)
-          : [],
-        updated_at: new Date().toISOString(),
-      })
+      .update(updates)
       .eq('id', id)
       .select()
       .single()

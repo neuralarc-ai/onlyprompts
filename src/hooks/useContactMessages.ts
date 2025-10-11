@@ -35,8 +35,8 @@ export function useContactMessages(options: UseContactMessagesOptions = {}) {
       }
 
       setMessages(data.messages);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
     }
@@ -69,8 +69,8 @@ export function useContactMessages(options: UseContactMessagesOptions = {}) {
       }
 
       return { success: true, data: result };
-    } catch (err: any) {
-      return { success: false, error: err.message };
+    } catch (err) {
+      return { success: false, error: err instanceof Error ? err.message : 'An error occurred' };
     }
   };
 

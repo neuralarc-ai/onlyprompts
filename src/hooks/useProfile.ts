@@ -34,8 +34,8 @@ export function useProfile(userId?: string) {
 
       if (error) throw error;
       setProfile(data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
     }
@@ -55,8 +55,8 @@ export function useProfile(userId?: string) {
       // Refresh profile data
       await fetchProfile();
       return true;
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
       return false;
     }
   };
@@ -71,8 +71,8 @@ export function useProfile(userId?: string) {
 
       if (error) throw error;
       return data.length === 0;
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
       return false;
     }
   };
@@ -96,8 +96,8 @@ export function useProfile(userId?: string) {
         .getPublicUrl(filePath);
 
       return data.publicUrl;
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
       return null;
     }
   };

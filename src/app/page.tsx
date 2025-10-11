@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -11,11 +11,11 @@ import PromptModal from '@/components/PromptModal';
 import { usePrompts } from '@/hooks/usePrompts';
 import { useAuth } from '@/hooks/useAuth';
 
-export default function Home() {
+function HomeContent() {
   const searchParams = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedPrompt, setSelectedPrompt] = useState<any>(null);
+  const [selectedPrompt, setSelectedPrompt] = useState<{ id: string; title: string; description: string; prompt: string; likes: number; created_at: string; updated_at: string; category: string; tags: string[]; image_url: string; author: string } | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { user } = useAuth();
 
@@ -42,7 +42,7 @@ export default function Home() {
     limit: 12
   });
 
-  const handlePromptClick = (prompt: any) => {
+  const handlePromptClick = (prompt: { id: string; title: string; description: string; prompt: string; likes: number; created_at: string; updated_at: string; category: string; tags: string[]; image_url: string; author: string }) => {
     setSelectedPrompt(prompt);
     setIsModalOpen(true);
   };
@@ -73,7 +73,7 @@ export default function Home() {
                     Search Results
                   </h2>
                   <p className="text-gray-600">
-                    Found {filteredPrompts.length} prompt{filteredPrompts.length !== 1 ? 's' : ''} for "{searchQuery}"
+                    Found {filteredPrompts.length} prompt{filteredPrompts.length !== 1 ? 's' : ''} for &quot;{searchQuery}&quot;
                   </p>
                 </div>
                 <button
@@ -177,5 +177,13 @@ export default function Home() {
         prompt={selectedPrompt}
       />
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomeContent />
+    </Suspense>
   );
 }

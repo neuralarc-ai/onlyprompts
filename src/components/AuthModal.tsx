@@ -7,44 +7,19 @@ import Logo from './Logo';
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAuthSuccess: (user: any) => void;
+  onAuthSuccess: (user: unknown) => void;
 }
 
-export default function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
+export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
-  const ensureProfile = async (user: any, preferredUsername?: string) => {
-    try {
-      // Only attempt when there is an active session for this user (RLS requirement)
-      const { data: sessionData } = await supabase.auth.getSession()
-      const sessionUserId = sessionData?.session?.user?.id
-      if (!sessionUserId || sessionUserId !== user?.id) {
-        return
-      }
-      const fallbackUsername = preferredUsername || (user?.user_metadata?.username) || (user?.email?.split('@')[0]) || 'user'
-      const { error: upsertError } = await supabase
-        .from('user_profiles')
-        .upsert({
-          id: user.id,
-          username: fallbackUsername,
-          full_name: fallbackUsername,
-        }, { onConflict: 'id' })
-
-      if (upsertError) {
-        console.error('Profile upsert error:', upsertError)
-      }
-    } catch (e) {
-      console.error('Profile upsert exception:', e)
-    }
-  };
 
   const handleSocialAuth = async (provider: 'google' | 'github') => {
     setLoading(true);
     setError('');
 
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
@@ -52,8 +27,8 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalP
       });
 
       if (error) throw error;
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'An error occurred');
       setLoading(false);
     }
   };

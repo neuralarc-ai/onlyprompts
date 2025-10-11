@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
@@ -353,7 +353,7 @@ export default function SubmitPage() {
             </div>
             <div className="flex items-start">
               <div className="w-2 h-2 bg-indigo-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-              <p>Provide an image that accurately represents your prompt's output</p>
+              <p>Provide an image that accurately represents your prompt&apos;s output</p>
             </div>
             <div className="flex items-start">
               <div className="w-2 h-2 bg-indigo-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>

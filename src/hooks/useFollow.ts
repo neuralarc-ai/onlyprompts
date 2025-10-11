@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import type { Database } from '@/lib/supabase';
 
-type Follow = Database['public']['Tables']['follows']['Row'];
 
 export function useFollow(currentUserId?: string) {
   const [following, setFollowing] = useState<string[]>([]);

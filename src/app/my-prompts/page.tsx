@@ -14,8 +14,7 @@ export default function MyPromptsPage() {
     avgLength: 0,
     lastUpdate: null as string | null,
   });
-  const [userPrompts, setUserPrompts] = useState([]);
-  const [sortBy, setSortBy] = useState<'liked'>('liked');
+  const [userPrompts, setUserPrompts] = useState<{ id: string; title: string; description: string; prompt: string; likes: number; created_at: string; updated_at: string; category: string; tags: string[]; image_url: string; author: string }[]>([]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -43,12 +42,12 @@ export default function MyPromptsPage() {
       if (promptsError) throw promptsError;
 
       const totalPrompts = prompts?.length || 0;
-      const totalLikes = (prompts || []).reduce((acc: number, p: any) => acc + (p.likes || 0), 0);
+      const totalLikes = (prompts || []).reduce((acc: number, p: { likes?: number }) => acc + (p.likes || 0), 0);
       const avgLength = totalPrompts > 0 
-        ? Math.round((prompts || []).reduce((acc: number, p: any) => acc + (p.prompt?.split(' ').length || 0), 0) / totalPrompts) || 0
+        ? Math.round((prompts || []).reduce((acc: number, p: { prompt?: string }) => acc + (p.prompt?.split(' ').length || 0), 0) / totalPrompts) || 0
         : 0;
       const lastUpdate = totalPrompts > 0 
-        ? new Date(Math.max(...(prompts || []).map((p: any) => new Date(p.updated_at).getTime()))).toLocaleDateString()
+        ? new Date(Math.max(...(prompts || []).map((p: { updated_at: string }) => new Date(p.updated_at).getTime()))).toLocaleDateString()
         : null;
 
       setUserStats({ totalPrompts, totalLikes, avgLength, lastUpdate });
@@ -169,7 +168,7 @@ export default function MyPromptsPage() {
                   </div>
 
                   <div className="space-y-4">
-                    {userPrompts.map((prompt: any) => (
+                    {userPrompts.map((prompt: { id: string; title: string; description: string; prompt: string; likes: number; created_at: string; updated_at: string; category: string; tags: string[]; image_url: string; author: string }) => (
                       <div key={prompt.id} className="p-4 rounded-xl border bg-white  border-gray-200 ">
                         <div>
                           <h3 className="font-semibold mb-2">{prompt.title}</h3>

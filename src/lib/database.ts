@@ -1,7 +1,6 @@
 import { supabase } from './supabase'
 import type { Database } from './supabase'
 
-type Prompt = Database['public']['Tables']['prompts']['Row']
 type PromptInsert = Database['public']['Tables']['prompts']['Insert']
 type PromptUpdate = Database['public']['Tables']['prompts']['Update']
 
@@ -202,14 +201,14 @@ export class DatabaseService {
   }
 
   // Real-time subscriptions
-  static subscribeToPrompts(callback: (payload: any) => void) {
+  static subscribeToPrompts(callback: (payload: unknown) => void) {
     return supabase
       .channel('prompts_changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'prompts' }, callback)
       .subscribe()
   }
 
-  static subscribeToLikes(callback: (payload: any) => void) {
+  static subscribeToLikes(callback: (payload: unknown) => void) {
     return supabase
       .channel('likes_changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'likes' }, callback)

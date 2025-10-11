@@ -47,8 +47,8 @@ export default function AdminContactPage() {
       }
 
       setMessages(data.messages);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
     }
@@ -58,8 +58,8 @@ export default function AdminContactPage() {
     try {
       // This would require a PATCH endpoint - for now we'll just refetch
       await fetchMessages();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     }
   };
 
