@@ -7,7 +7,7 @@ import Footer from '@/components/Footer';
 import Hero from '@/components/Hero';
 import CategoryFilter from '@/components/CategoryFilter';
 import PromptCard from '@/components/PromptCard';
-import PromptModal from '@/components/PromptModal';
+// PromptModal import removed - now using direct navigation to prompt pages
 import { usePrompts } from '@/hooks/usePrompts';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -15,8 +15,7 @@ function HomeContent() {
   const searchParams = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedPrompt, setSelectedPrompt] = useState<{ id: string; title: string; description: string; prompt: string; likes: number; created_at: string; updated_at: string; category: string; tags: string[]; image_url: string; author: string } | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // Modal state removed - now using direct navigation to prompt pages
   const { user } = useAuth();
 
   // Get search query from URL
@@ -42,15 +41,7 @@ function HomeContent() {
     limit: 12
   });
 
-  const handlePromptClick = (prompt: { id: string; title: string; description: string; prompt: string; likes: number; created_at: string; updated_at: string; category: string; tags: string[]; image_url: string; author: string }) => {
-    setSelectedPrompt(prompt);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedPrompt(null);
-  };
+  // Modal functionality removed - now using direct navigation to prompt pages
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -122,7 +113,6 @@ function HomeContent() {
               likes={prompt.likes}
               category={prompt.category}
               created_at={prompt.created_at}
-              onClick={() => handlePromptClick(prompt)}
               userId={user?.id}
             />
           ))}
@@ -170,12 +160,7 @@ function HomeContent() {
 
       <Footer />
 
-      {/* Modal */}
-      <PromptModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        prompt={selectedPrompt}
-      />
+      {/* Modal removed - now using direct navigation to prompt pages */}
     </div>
   );
 }

@@ -1,85 +1,76 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PromptCard from '@/components/PromptCard';
-import PromptModal from '@/components/PromptModal';
-import { samplePrompts } from '@/data/samplePrompts';
-
-interface Prompt {
-  id: string;
-  title: string;
-  description: string;
-  prompt: string;
-  image_url: string;
-  author: string;
-  likes: number;
-  category: string;
-  created_at: string;
-  updated_at: string;
-  tags: string[];
-}
+import { usePrompts } from '@/hooks/usePrompts';
+import { useAuth } from '@/hooks/useAuth';
+import { DatabaseService } from '@/lib/database';
 
 const categories = [
-  { name: 'Art & Design', icon: '🎨', count: 0, description: 'Creative visual prompts for art and design' },
-  { name: 'Writing', icon: '✍️', count: 0, description: 'Content creation and writing prompts' },
-  { name: 'Marketing', icon: '📢', count: 0, description: 'Marketing and advertising prompts' },
-  { name: 'Code', icon: '💻', count: 0, description: 'Programming and development prompts' },
-  { name: 'Photography', icon: '📸', count: 0, description: 'Photography and visual prompts' },
-  { name: 'Music', icon: '🎵', count: 0, description: 'Music and audio creation prompts' },
-  { name: 'Business', icon: '💼', count: 0, description: 'Business and professional prompts' },
-  { name: 'Education', icon: '🎓', count: 0, description: 'Educational and learning prompts' },
-  { name: 'Gaming', icon: '🎮', count: 0, description: 'Gaming and interactive prompts' },
-  { name: 'Social Media', icon: '📱', count: 0, description: 'Social media content prompts' },
-  { name: 'Productivity', icon: '⚡', count: 0, description: 'Productivity and efficiency prompts' },
+  { name: 'Art & Design', icon: '🎨', description: 'Creative visual prompts for art and design' },
+  { name: 'Writing', icon: '✍️', description: 'Content creation and writing prompts' },
+  { name: 'Marketing', icon: '📢', description: 'Marketing and advertising prompts' },
+  { name: 'Code', icon: '💻', description: 'Programming and development prompts' },
+  { name: 'Photography', icon: '📸', description: 'Photography and visual prompts' },
+  { name: 'Music', icon: '🎵', description: 'Music and audio creation prompts' },
+  { name: 'Business', icon: '💼', description: 'Business and professional prompts' },
+  { name: 'Education', icon: '🎓', description: 'Educational and learning prompts' },
+  { name: 'Gaming', icon: '🎮', description: 'Gaming and interactive prompts' },
+  { name: 'Social Media', icon: '📱', description: 'Social media content prompts' },
+  { name: 'Productivity', icon: '⚡', description: 'Productivity and efficiency prompts' },
 ];
 
 export default function CategoriesPage() {
+  const { user } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [categoriesWithCounts, setCategoriesWithCounts] = useState<Array<{name: string, icon: string, count: number, description: string}>>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
 
-  // Transform sample prompts to match expected format
-  const transformedPrompts = useMemo(() => {
-    return samplePrompts.map(prompt => ({
-      id: prompt.id,
-      title: prompt.title,
-      description: prompt.description,
-      prompt: prompt.prompt,
-      image_url: prompt.imageUrl,
-      author: prompt.author,
-      likes: prompt.likes,
-      category: prompt.category,
-      created_at: prompt.createdAt,
-      updated_at: prompt.createdAt,
-      tags: []
-    }));
+  // Use the prompts hook for the selected category
+  const { 
+    prompts: filteredPrompts, 
+    loading, 
+    error, 
+    hasMore, 
+    loadMore, 
+    refresh 
+  } = usePrompts({
+    category: selectedCategory || undefined,
+    limit: 12
+  });
+
+  // Load category counts from database
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        setLoadingCategories(true);
+        const dbCategories = await DatabaseService.getCategories();
+        
+        // Merge with predefined categories and add counts
+        const mergedCategories = categories.map(category => {
+          const dbCategory = dbCategories.find(db => db.name === category.name);
+          return {
+            ...category,
+            count: dbCategory?.count || 0
+          };
+        });
+        
+        setCategoriesWithCounts(mergedCategories);
+      } catch (err) {
+        console.error('Error loading categories:', err);
+        // Fallback to categories with 0 counts
+        setCategoriesWithCounts(categories.map(cat => ({ ...cat, count: 0 })));
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    loadCategories();
   }, []);
 
-  // Calculate category counts
-  const categoriesWithCounts = useMemo(() => {
-    return categories.map(category => ({
-      ...category,
-      count: transformedPrompts.filter(prompt => prompt.category === category.name).length
-    }));
-  }, [transformedPrompts]);
-
-  // Filter prompts by selected category
-  const filteredPrompts = useMemo(() => {
-    if (!selectedCategory) return [];
-    return transformedPrompts.filter(prompt => prompt.category === selectedCategory);
-  }, [selectedCategory, transformedPrompts]);
-
-  const handlePromptClick = (prompt: Prompt) => {
-    setSelectedPrompt(prompt);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedPrompt(null);
-  };
+  // Modal functionality removed - now using direct navigation to prompt pages
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -105,33 +96,45 @@ export default function CategoriesPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Categories Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
-          {categoriesWithCounts.map((category) => (
-            <button
-              key={category.name}
-              onClick={() => setSelectedCategory(category.name)}
-              className={`p-6 rounded-xl border-2 transition-all duration-200 text-left ${
-                selectedCategory === category.name
-                  ? 'border-black bg-gray-50 shadow-lg'
-                  : 'border-gray-200 bg-white hover:border-gray-400 hover:shadow-md'
-              }`}
-            >
-              <div className="text-4xl mb-3">{category.icon}</div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {category.name}
-              </h3>
-              <p className="text-sm text-gray-600 mb-3">
-                {category.description}
-              </p>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-500">
-                  {category.count} prompts
-                </span>
-                {selectedCategory === category.name && (
-                  <div className="w-2 h-2 bg-black rounded-full"></div>
-                )}
+          {loadingCategories ? (
+            // Loading state for categories
+            Array.from({ length: 8 }).map((_, index) => (
+              <div key={index} className="p-6 rounded-xl border-2 border-gray-200 bg-white animate-pulse">
+                <div className="text-4xl mb-3">⏳</div>
+                <div className="h-6 bg-gray-200 rounded mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded mb-3"></div>
+                <div className="h-4 bg-gray-200 rounded w-20"></div>
               </div>
-            </button>
-          ))}
+            ))
+          ) : (
+            categoriesWithCounts.map((category) => (
+              <button
+                key={category.name}
+                onClick={() => setSelectedCategory(category.name)}
+                className={`p-6 rounded-xl border-2 transition-all duration-200 text-left ${
+                  selectedCategory === category.name
+                    ? 'border-black bg-gray-50 shadow-lg'
+                    : 'border-gray-200 bg-white hover:border-gray-400 hover:shadow-md'
+                }`}
+              >
+                <div className="text-4xl mb-3">{category.icon}</div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  {category.name}
+                </h3>
+                <p className="text-sm text-gray-600 mb-3">
+                  {category.description}
+                </p>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-500">
+                    {category.count} prompts
+                  </span>
+                  {selectedCategory === category.name && (
+                    <div className="w-2 h-2 bg-black rounded-full"></div>
+                  )}
+                </div>
+              </button>
+            ))
+          )}
         </div>
 
         {/* Selected Category Results */}
@@ -149,7 +152,28 @@ export default function CategoriesPage() {
               </button>
             </div>
 
-            {filteredPrompts.length > 0 ? (
+            {/* Loading State */}
+            {loading && filteredPrompts.length === 0 && (
+              <div className="flex justify-center items-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              </div>
+            )}
+
+            {/* Error State */}
+            {error && (
+              <div className="text-center py-12">
+                <div className="text-red-500 mb-4">Error: {error}</div>
+                <button
+                  onClick={refresh}
+                  className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors"
+                >
+                  Try Again
+                </button>
+              </div>
+            )}
+
+            {/* Prompts Grid */}
+            {!loading && !error && filteredPrompts.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredPrompts.map((prompt) => (
                   <PromptCard
@@ -158,24 +182,46 @@ export default function CategoriesPage() {
                     title={prompt.title}
                     description={prompt.description}
                     prompt={prompt.prompt}
-                    imageUrl={prompt.image_url}
+                    image_url={prompt.image_url}
                     author={prompt.author}
                     likes={prompt.likes}
                     category={prompt.category}
-                    createdAt={prompt.created_at}
-                    onClick={() => handlePromptClick(prompt)}
+                    created_at={prompt.created_at}
+                    userId={user?.id}
                   />
                 ))}
               </div>
-            ) : (
+            )}
+
+            {/* No Results State */}
+            {!loading && !error && filteredPrompts.length === 0 && (
               <div className="text-center py-12">
                 <div className="text-6xl mb-4">🔍</div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
                   No prompts found
                 </h3>
-                <p className="text-gray-600">
-                  We&apos;re working on adding more {selectedCategory.toLowerCase()} prompts.
+                <p className="text-gray-600 mb-6">
+                  No {selectedCategory.toLowerCase()} prompts available yet. Be the first to submit one!
                 </p>
+                <button
+                  onClick={() => window.location.href = '/submit'}
+                  className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-all duration-200 font-medium"
+                >
+                  Submit a Prompt
+                </button>
+              </div>
+            )}
+
+            {/* Load More Button */}
+            {filteredPrompts.length > 0 && hasMore && (
+              <div className="text-center mt-12">
+                <button 
+                  onClick={loadMore}
+                  disabled={loading}
+                  className="bg-black text-white px-8 py-3 rounded-xl hover:bg-gray-800 transition-all duration-200 font-medium shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Loading...' : 'Load More Prompts'}
+                </button>
               </div>
             )}
           </div>
@@ -204,13 +250,6 @@ export default function CategoriesPage() {
       </main>
 
       <Footer />
-
-      {/* Modal */}
-      <PromptModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        prompt={selectedPrompt}
-      />
     </div>
   );
 }

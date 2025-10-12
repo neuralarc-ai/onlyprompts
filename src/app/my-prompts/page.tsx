@@ -139,28 +139,28 @@ export default function MyPromptsPage() {
                 </div>
               ) : (
                 <>
-                  <div className="flex items-center justify-between mb-6 p-4 rounded-xl bg-gray-50 ">
-                    <div className="flex space-x-6">
-                      <div>
+                  <div className="mb-6">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                      <div className="bg-gray-100 rounded-full p-4 border border-gray-200 shadow-sm">
                         <span className="text-sm text-gray-500">Prompts</span>
                         <div className="text-2xl font-bold">{userStats.totalPrompts}</div>
                       </div>
-                      <div>
+                      <div className="bg-gray-100 rounded-full p-4 border border-gray-200 shadow-sm">
                         <span className="text-sm text-gray-500">Avg length</span>
                         <div className="text-2xl font-bold">{userStats.avgLength} words</div>
                       </div>
-                      <div>
+                      <div className="bg-gray-100 rounded-full p-4 border border-gray-200 shadow-sm">
                         <span className="text-sm text-gray-500">Total likes</span>
                         <div className="text-2xl font-bold">{userStats.totalLikes}</div>
                       </div>
-                      <div>
+                      <div className="bg-gray-100 rounded-full p-4 border border-gray-200 shadow-sm">
                         <span className="text-sm text-gray-500">Last update</span>
                         <div className="text-2xl font-bold">{userStats.lastUpdate || '—'}</div>
                       </div>
                     </div>
-                    <div className="flex space-x-2">
+                    <div className="flex justify-end">
                       <button
-                        className="px-4 py-2 rounded-lg text-sm font-medium bg-black  text-white "
+                        className="px-4 py-2 rounded-lg text-sm font-medium bg-black text-white hover:bg-gray-800 transition-colors"
                       >
                         Most liked
                       </button>
@@ -227,18 +227,24 @@ export default function MyPromptsPage() {
                   <span>{userStats.lastUpdate || '—'}</span>
                 </div>
               </div>
-              <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-300 ">
-                <div className="flex items-center text-sm">
-                  <svg className="w-4 h-4 mr-1 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                  </svg>
-                  {userStats.totalLikes} total likes
-                </div>
-                <div className="flex items-center text-sm">
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  {userStats.totalPrompts} published prompts
+              <div className="mt-4 pt-4 border-t border-gray-300">
+                <div className="grid grid-cols-1 gap-3">
+                  <div className="bg-gray-100 rounded-full p-3 border border-gray-200 shadow-sm">
+                    <div className="flex items-center text-sm">
+                      <svg className="w-4 h-4 mr-2 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                      </svg>
+                      <span className="font-medium">{userStats.totalLikes} total likes</span>
+                    </div>
+                  </div>
+                  <div className="bg-gray-100 rounded-full p-3 border border-gray-200 shadow-sm">
+                    <div className="flex items-center text-sm">
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      <span className="font-medium">{userStats.totalPrompts} published prompts</span>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div className="flex space-x-3 mt-6">

@@ -65,12 +65,6 @@ export default function Header() {
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Link
-                    href="/profile/settings"
-                    className="text-gray-600 hover:text-gray-900 transition-colors text-sm px-3 py-1 rounded-lg hover:bg-gray-100"
-                  >
-                    Settings
-                  </Link>
                   <button
                     onClick={signOut}
                     className="text-gray-600 hover:text-gray-900 transition-colors text-sm px-3 py-1 rounded-lg hover:bg-gray-100"
@@ -170,13 +164,6 @@ export default function Header() {
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Link
-                        href="/profile/settings"
-                        className="text-sm text-blue-600 hover:text-blue-700 px-3 py-1 rounded-lg hover:bg-blue-50"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        Settings
-                      </Link>
                       <button
                         onClick={signOut}
                         className="text-sm text-blue-600 hover:text-blue-700 px-3 py-1 rounded-lg hover:bg-blue-50"

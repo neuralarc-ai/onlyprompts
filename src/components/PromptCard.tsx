@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useLikes } from '@/hooks/useLikes';
 
 interface PromptCardProps {
@@ -16,7 +17,6 @@ interface PromptCardProps {
   category: string;
   created_at?: string; // snake_case (from DB)
   createdAt?: string;  // camelCase (from sample data)
-  onClick?: () => void;
   userId?: string;
 }
 
@@ -32,9 +32,9 @@ export default function PromptCard({
   category,
   created_at,
   createdAt,
-  onClick,
   userId
 }: PromptCardProps) {
+  const router = useRouter();
   const [likeCount, setLikeCount] = useState(likes);
   const [isCopied, setIsCopied] = useState(false);
   const { toggleLike, isLiked: userLiked } = useLikes(userId);
@@ -71,6 +71,10 @@ export default function PromptCard({
     }
   };
 
+  const handleCardClick = () => {
+    router.push(`/prompts/${id}`);
+  };
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { 
@@ -86,7 +90,7 @@ export default function PromptCard({
   return (
     <div 
       className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer"
-      onClick={onClick}
+      onClick={handleCardClick}
     >
       {/* Image */}
       <div className="relative h-48 w-full">

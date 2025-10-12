@@ -1,61 +1,29 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PromptCard from '@/components/PromptCard';
-import PromptModal from '@/components/PromptModal';
-import { samplePrompts } from '@/data/samplePrompts';
-
-interface Prompt {
-  id: string;
-  title: string;
-  description: string;
-  prompt: string;
-  image_url: string;
-  author: string;
-  likes: number;
-  category: string;
-  created_at: string;
-  updated_at: string;
-  tags: string[];
-}
+import { usePrompts } from '@/hooks/usePrompts';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function TrendingPage() {
-  const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { user } = useAuth();
+  
+  // Use the prompts hook with trending enabled
+  const { 
+    prompts: trendingPrompts, 
+    loading, 
+    error, 
+    hasMore, 
+    loadMore, 
+    refresh 
+  } = usePrompts({
+    trending: true,
+    limit: 12
+  });
 
-  // Transform sample prompts to match expected format
-  const transformedPrompts = useMemo(() => {
-    return samplePrompts.map(prompt => ({
-      id: prompt.id,
-      title: prompt.title,
-      description: prompt.description,
-      prompt: prompt.prompt,
-      image_url: prompt.imageUrl,
-      author: prompt.author,
-      likes: prompt.likes,
-      category: prompt.category,
-      created_at: prompt.createdAt,
-      updated_at: prompt.createdAt,
-      tags: []
-    }));
-  }, []);
-
-  // Sort prompts by likes (most popular first)
-  const trendingPrompts = useMemo(() => {
-    return [...transformedPrompts].sort((a, b) => b.likes - a.likes);
-  }, [transformedPrompts]);
-
-  const handlePromptClick = (prompt: Prompt) => {
-    setSelectedPrompt(prompt);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedPrompt(null);
-  };
+  // Modal functionality removed - now using direct navigation to prompt pages
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -98,55 +66,95 @@ export default function TrendingPage() {
       </section>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Loading State */}
+        {loading && trendingPrompts.length === 0 && (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="text-center py-12">
+            <div className="text-red-500 mb-4">Error: {error}</div>
+            <button
+              onClick={refresh}
+              className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        )}
+
         {/* Trending Prompts Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {trendingPrompts.map((prompt, index) => (
-            <div key={prompt.id} className="relative">
-              {/* Trending Badge */}
-              {index < 3 && (
-                <div className="absolute -top-2 -left-2 z-10">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${
-                    index === 0 ? 'bg-yellow-500' : 
-                    index === 1 ? 'bg-gray-400' : 
-                    'bg-orange-500'
-                  }`}>
-                    {index + 1}
+        {!loading && !error && trendingPrompts.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {trendingPrompts.map((prompt, index) => (
+              <div key={prompt.id} className="relative">
+                {/* Trending Badge */}
+                {index < 3 && (
+                  <div className="absolute -top-2 -left-2 z-10">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${
+                      index === 0 ? 'bg-yellow-500' : 
+                      index === 1 ? 'bg-gray-400' : 
+                      'bg-orange-500'
+                    }`}>
+                      {index + 1}
+                    </div>
                   </div>
-                </div>
-              )}
-              
-              <PromptCard
-                id={prompt.id}
-                title={prompt.title}
-                description={prompt.description}
-                prompt={prompt.prompt}
-                imageUrl={prompt.image_url}
-                author={prompt.author}
-                likes={prompt.likes}
-                category={prompt.category}
-                createdAt={prompt.created_at}
-                onClick={() => handlePromptClick(prompt)}
-              />
-            </div>
-          ))}
-        </div>
+                )}
+                
+                <PromptCard
+                  id={prompt.id}
+                  title={prompt.title}
+                  description={prompt.description}
+                  prompt={prompt.prompt}
+                  image_url={prompt.image_url}
+                  author={prompt.author}
+                  likes={prompt.likes}
+                  category={prompt.category}
+                  created_at={prompt.created_at}
+                  userId={user?.id}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* No Results State */}
+        {!loading && !error && trendingPrompts.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">🔥</div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              No trending prompts yet
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Be the first to submit a prompt and start trending!
+            </p>
+            <button
+              onClick={() => window.location.href = '/submit'}
+              className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-all duration-200 font-medium"
+            >
+              Submit a Prompt
+            </button>
+          </div>
+        )}
 
         {/* Load More Button */}
-        <div className="text-center mt-12">
-          <button className="bg-black text-white px-8 py-3 rounded-xl hover:bg-gray-800 transition-all duration-200 font-medium shadow-lg">
-            Load More Trending
-          </button>
-        </div>
+        {trendingPrompts.length > 0 && hasMore && (
+          <div className="text-center mt-12">
+            <button 
+              onClick={loadMore}
+              disabled={loading}
+              className="bg-black text-white px-8 py-3 rounded-xl hover:bg-gray-800 transition-all duration-200 font-medium shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Loading...' : 'Load More Trending'}
+            </button>
+          </div>
+        )}
       </main>
 
       <Footer />
-
-      {/* Modal */}
-      <PromptModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        prompt={selectedPrompt}
-      />
     </div>
   );
 }
