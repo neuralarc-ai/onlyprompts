@@ -24,7 +24,7 @@ export default function TermsPage() {
         <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
           <div className="prose prose-lg max-w-none">
             <p className="text-gray-600 mb-8">
-              <strong>Last updated:</strong> January 2024
+              <strong>Last updated:</strong> October 2025
             </p>
 
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Acceptance of Terms</h2>
