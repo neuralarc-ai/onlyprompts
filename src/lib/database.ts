@@ -29,6 +29,7 @@ export class DatabaseService {
     const { data, error } = await supabase
       .from('prompts')
       .select('*')
+      .eq('approval_status', 'approved')
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1)
 
@@ -48,6 +49,7 @@ export class DatabaseService {
       .from('prompts')
       .select('*')
       .eq('id', id)
+      .eq('approval_status', 'approved')
       .single()
 
     if (error) throw error
@@ -65,6 +67,7 @@ export class DatabaseService {
       .from('prompts')
       .select('*')
       .eq('category', category)
+      .eq('approval_status', 'approved')
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1)
 
@@ -82,6 +85,7 @@ export class DatabaseService {
     const { data, error } = await supabase
       .from('prompts')
       .select('*')
+      .eq('approval_status', 'approved')
       .order('likes', { ascending: false })
       .range(offset, offset + limit - 1)
 
@@ -99,6 +103,7 @@ export class DatabaseService {
     const { data, error } = await supabase
       .from('prompts')
       .select('*')
+      .eq('approval_status', 'approved')
       .or(`title.ilike.%${query}%,description.ilike.%${query}%,prompt.ilike.%${query}%,author.ilike.%${query}%,category.ilike.%${query}%`)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1)
@@ -220,6 +225,7 @@ export class DatabaseService {
     const { data, error } = await supabase
       .from('prompts')
       .select('category')
+      .eq('approval_status', 'approved')
       .not('category', 'is', null)
 
     if (error) throw error
@@ -234,5 +240,77 @@ export class DatabaseService {
       name,
       count: count as number
     }))
+  }
+
+  // SuperAdmin functions
+  static async isSuperAdmin(userId: string) {
+    const { data, error } = await supabase
+      .rpc('is_superadmin', { user_id: userId })
+
+    if (error) throw error
+    return data
+  }
+
+  static async getUserRole(userId: string) {
+    const { data, error } = await supabase
+      .rpc('get_user_role', { user_id: userId })
+
+    if (error) throw error
+    return data
+  }
+
+  static async getPendingPrompts(limit: number = 50, offset: number = 0) {
+    const { data, error } = await supabase
+      .from('pending_prompts')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1)
+
+    if (error) throw error
+    return data
+  }
+
+  static async approvePrompt(promptId: string, reviewerId: string) {
+    const { error } = await supabase
+      .rpc('approve_prompt', { 
+        prompt_id: promptId, 
+        reviewer_id: reviewerId 
+      })
+
+    if (error) throw error
+  }
+
+  static async rejectPrompt(promptId: string, reviewerId: string, reason?: string) {
+    const { error } = await supabase
+      .rpc('reject_prompt', { 
+        prompt_id: promptId, 
+        reviewer_id: reviewerId,
+        reason: reason || null
+      })
+
+    if (error) throw error
+  }
+
+  static async getAllPrompts(limit: number = 50, offset: number = 0) {
+    const { data, error } = await supabase
+      .from('prompts')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1)
+
+    if (error) throw error
+    return data
+  }
+
+  static async getPromptsByStatus(status: 'pending' | 'approved' | 'rejected', limit: number = 50, offset: number = 0) {
+    const { data, error } = await supabase
+      .from('prompts')
+      .select('*')
+      .eq('approval_status', status)
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1)
+
+    if (error) throw error
+    return data
   }
 }

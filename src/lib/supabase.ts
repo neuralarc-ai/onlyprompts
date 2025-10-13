@@ -34,6 +34,10 @@ export interface Database {
           created_at: string
           updated_at: string
           user_id: string | null
+          approval_status: 'pending' | 'approved' | 'rejected'
+          reviewed_by: string | null
+          reviewed_at: string | null
+          rejection_reason: string | null
         }
         Insert: {
           id?: string
@@ -48,6 +52,10 @@ export interface Database {
           created_at?: string
           updated_at?: string
           user_id?: string | null
+          approval_status?: 'pending' | 'approved' | 'rejected'
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          rejection_reason?: string | null
         }
         Update: {
           id?: string
@@ -62,6 +70,33 @@ export interface Database {
           created_at?: string
           updated_at?: string
           user_id?: string | null
+          approval_status?: 'pending' | 'approved' | 'rejected'
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          rejection_reason?: string | null
+        }
+      }
+      user_roles: {
+        Row: {
+          id: string
+          user_id: string
+          role: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          role?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          role?: string
+          created_at?: string
+          updated_at?: string
         }
       }
       likes: {

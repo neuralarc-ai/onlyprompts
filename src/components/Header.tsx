@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
+import { useSuperAdmin } from '@/hooks/useSuperAdmin';
 import AuthModal from './AuthModal';
 import Logo from './Logo';
 
@@ -10,6 +11,7 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { user, signOut } = useAuth();
+  const { isSuperAdmin } = useSuperAdmin();
 
   return (
     <header className="py-4">
@@ -43,6 +45,11 @@ export default function Header() {
             <Link href="/submit" className="text-gray-700 hover:text-gray-900 transition-colors">
               Submit
             </Link>
+            {isSuperAdmin && (
+              <Link href="/admin/dashboard" className="text-gray-700 hover:text-gray-900 transition-colors font-medium">
+                Admin
+              </Link>
+            )}
           </nav>
 
           {/* Auth Section */}
@@ -143,6 +150,15 @@ export default function Header() {
               >
                 Submit
               </Link>
+              {isSuperAdmin && (
+                <Link
+                  href="/admin/dashboard"
+                  className="block px-3 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md font-medium"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Admin
+                </Link>
+              )}
               
               {/* Mobile Auth */}
               <div className="px-3 py-4 border-t border-gray-200">
