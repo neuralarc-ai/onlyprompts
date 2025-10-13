@@ -54,7 +54,7 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Contact Us</h2>
             <p className="text-gray-600 mb-6">
               If you have any questions about this Privacy Policy, please contact us at 
-              <a href="mailto:privacy@nanob.com" className="text-blue-600 hover:underline"> privacy@nanob.com</a>.
+              <a href="mailto:privacy@onlyprompts.com" className="text-blue-600 hover:underline"> privacy@onlyprompts.com</a>.
             </p>
           </div>
         </div>

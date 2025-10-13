@@ -21,7 +21,7 @@ export default function Header() {
             <div className="w-8 h-8 flex items-center justify-center">
               <Logo className="" size="sm" />
             </div>
-            <span className="text-xl font-bold text-gray-900">NanoB</span>
+            <span className="text-xl font-bold text-gray-900">OnlyPrompts</span>
           </Link>
 
           {/* Desktop Navigation */}

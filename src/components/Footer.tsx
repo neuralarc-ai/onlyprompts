@@ -12,7 +12,7 @@ export default function Footer() {
               <div className="w-8 h-8 flex items-center justify-center">
                 <Logo className="" size="sm" />
               </div>
-              <span className="text-xl font-bold text-gray-900">NanoB</span>
+              <span className="text-xl font-bold text-gray-900">OnlyPrompts</span>
             </Link>
             <p className="text-gray-600 mb-4 max-w-md">
               Discover and share the best AI prompts for creative inspiration. Join our community of creators and explore endless possibilities.
@@ -97,7 +97,7 @@ export default function Footer() {
 
         <div className="mt-8 pt-8 border-t border-gray-200">
           <p className="text-center text-gray-500 text-sm">
-            © 2025 NanoB. Created and Powered by Helium AI.
+            © 2025 OnlyPrompts. Created and Powered by Helium AI.
           </p>
         </div>
       </div>

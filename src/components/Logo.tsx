@@ -17,7 +17,7 @@ export default function Logo({ className = '', size = 'md' }: LogoProps) {
     <div className={`${sizeClasses[size]} ${className}`}>
       <Image
         src="/nanologo.jpg"
-        alt="NanoB Logo"
+        alt="OnlyPrompts Logo"
         width={size === 'sm' ? 24 : size === 'md' ? 32 : 48}
         height={size === 'sm' ? 24 : size === 'md' ? 32 : 48}
         className="w-full h-full object-contain"

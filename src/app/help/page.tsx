@@ -11,8 +11,8 @@ interface FAQItem {
 
 const faqData: FAQItem[] = [
   {
-    question: "What is NanoB?",
-    answer: "NanoB is a community-driven platform for discovering, sharing, and learning from AI prompts. We provide a curated collection of high-quality prompts across various categories to help users get the most out of AI tools."
+    question: "What is OnlyPrompts?",
+    answer: "OnlyPrompts is a community-driven platform for discovering, sharing, and learning from AI prompts. We provide a curated collection of high-quality prompts across various categories to help users get the most out of AI tools."
   },
   {
     question: "How do I submit a prompt?",
@@ -28,7 +28,7 @@ const faqData: FAQItem[] = [
   },
   {
     question: "Can I use these prompts commercially?",
-    answer: "Yes, all prompts on NanoB are shared with the community and can be used for personal or commercial projects. However, we encourage giving credit to the original author when possible."
+    answer: "Yes, all prompts on OnlyPrompts are shared with the community and can be used for personal or commercial projects. However, we encourage giving credit to the original author when possible."
   },
   {
     question: "How are prompts categorized?",
@@ -43,8 +43,8 @@ const faqData: FAQItem[] = [
     answer: "If you encounter any inappropriate or offensive content, please contact us through our contact page. We take content moderation seriously and will review all reports promptly."
   },
   {
-    question: "Is NanoB free to use?",
-    answer: "Yes, NanoB is completely free to use. You can browse, search, and copy prompts without any cost. We believe in making AI creativity accessible to everyone."
+    question: "Is OnlyPrompts free to use?",
+    answer: "Yes, OnlyPrompts is completely free to use. You can browse, search, and copy prompts without any cost. We believe in making AI creativity accessible to everyone."
   },
   {
     question: "How can I contribute to the community?",
@@ -80,7 +80,7 @@ export default function HelpPage() {
               </span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Find answers to common questions and learn how to make the most of NanoB.
+              Find answers to common questions and learn how to make the most of OnlyPrompts.
             </p>
           </div>
         </div>
@@ -218,7 +218,7 @@ export default function HelpPage() {
           <div className="bg-black rounded-2xl p-8 text-white">
             <h2 className="text-3xl font-bold mb-4">Still Need Help?</h2>
             <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-              Can&apos;t find what you&apos;re looking for? Our support team is here to help you get the most out of NanoB.
+              Can&apos;t find what you&apos;re looking for? Our support team is here to help you get the most out of OnlyPrompts.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a 

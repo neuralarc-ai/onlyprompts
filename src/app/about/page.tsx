@@ -17,7 +17,7 @@ export default function AboutPage() {
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
               About
               <span className="text-black">
-                {' '}NanoB
+                {' '}OnlyPrompts
               </span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
@@ -34,7 +34,7 @@ export default function AboutPage() {
           <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Our Mission</h2>
             <p className="text-lg text-gray-600 leading-relaxed text-center max-w-3xl mx-auto">
-              NanoB exists to democratize AI creativity by providing a platform where anyone can discover, 
+              OnlyPrompts exists to democratize AI creativity by providing a platform where anyone can discover, 
               share, and learn from the best AI prompts. We believe that artificial intelligence should be 
               accessible to everyone, regardless of their technical background.
             </p>
@@ -107,7 +107,7 @@ export default function AboutPage() {
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Built with ❤️</h2>
           <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
             <p className="text-lg text-gray-600 leading-relaxed text-center max-w-3xl mx-auto mb-6">
-              NanoB is built by a passionate team of developers, designers, and AI enthusiasts 
+              OnlyPrompts is built by a passionate team of developers, designers, and AI enthusiasts 
               who believe in the power of community-driven innovation.
             </p>
             <div className="text-center">
@@ -147,7 +147,7 @@ export default function AboutPage() {
           <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Get Involved</h2>
             <p className="text-lg text-gray-600 mb-6 max-w-2xl mx-auto">
-              Have questions, suggestions, or want to contribute to NanoB? 
+              Have questions, suggestions, or want to contribute to OnlyPrompts? 
               We&apos;d love to hear from you!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

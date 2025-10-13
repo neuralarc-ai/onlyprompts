@@ -14,8 +14,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NanoB - AI Prompt Gallery",
+  title: "OnlyPrompts - AI Prompt Gallery",
   description: "Discover and share the best AI prompts for creative inspiration",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
