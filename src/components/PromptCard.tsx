@@ -89,7 +89,7 @@ export default function PromptCard({
 
   return (
     <div 
-      className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+      className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer"
       onClick={handleCardClick}
     >
       {/* Image with Overlaid Content */}
