@@ -92,8 +92,8 @@ export default function PromptCard({
       className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer"
       onClick={handleCardClick}
     >
-      {/* Image */}
-      <div className="relative h-48 w-full">
+      {/* Image with Overlaid Content */}
+      <div className="relative aspect-square w-full">
         {normalizedImageUrl !== '' ? (
           (() => {
             let isAllowed = false
@@ -145,68 +145,59 @@ export default function PromptCard({
             </div>
           </div>
         )}
+
+        {/* Category Tag */}
         <div className="absolute top-3 left-3">
           <span className="bg-white/90 backdrop-blur-sm text-xs font-medium px-2 py-1 rounded-full text-gray-700">
             {category}
           </span>
         </div>
-      </div>
 
-      {/* Content */}
-      <div className="p-4">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-          {title}
-        </h3>
-        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-          {description}
-        </p>
-
-        {/* Prompt Preview */}
-        <div className="bg-gray-50 rounded-lg p-3 mb-4">
-          <p className="text-sm text-gray-700 line-clamp-3 font-mono">
-            {prompt}
-          </p>
+        {/* Title and Like Count - Top Right */}
+        <div className="absolute top-3 right-3 text-right">
+          <h3 className="text-white font-bold text-sm mb-1 drop-shadow-lg line-clamp-1">
+            {title}
+          </h3>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleLike();
+            }}
+            className="flex items-center justify-end space-x-1 hover:opacity-80 transition-opacity"
+          >
+            <svg
+              className={`h-4 w-4 text-white drop-shadow-lg ${userLiked(id) ? 'fill-current' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              />
+            </svg>
+            <span className="text-white text-sm font-medium drop-shadow-lg">{likeCount}</span>
+          </button>
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleLike();
-              }}
-              className={`flex items-center space-x-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                userLiked(id)
-                  ? 'bg-black text-white' 
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              <svg
-                className={`h-4 w-4 ${userLiked(id) ? 'fill-current' : ''}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                />
-              </svg>
-              <span>{likeCount}</span>
-            </button>
-
+        {/* Description and Actions - Bottom Overlay */}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/60 to-transparent p-4">
+          <p className="text-white text-sm mb-3 line-clamp-2 drop-shadow-lg">
+            {description}
+          </p>
+          
+          <div className="flex items-center justify-between">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 handleCopy();
               }}
-              className={`flex items-center space-x-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 isCopied 
-                  ? 'bg-black text-white' 
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-white text-black' 
+                  : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm'
               }`}
             >
               <svg
@@ -224,20 +215,18 @@ export default function PromptCard({
               </svg>
               <span>{isCopied ? 'Copied!' : 'Copy'}</span>
             </button>
+
+            <div className="text-xs text-white/80">
+              by {author}
+            </div>
           </div>
 
-          <div className="text-xs text-gray-500">
-            by {author}
-          </div>
-        </div>
-
-        {/* Metadata */}
-        <div className="mt-3 pt-3 border-t border-gray-100">
-          <div className="flex items-center justify-between text-xs text-gray-500">
+          {/* Date and Share */}
+          <div className="flex items-center justify-between text-xs text-white/70 mt-2">
             <span>{formatDate(normalizedCreatedAt)}</span>
             <button 
               onClick={(e) => e.stopPropagation()}
-              className="hover:text-gray-700 transition-colors"
+              className="hover:text-white transition-colors"
             >
               Share
             </button>
