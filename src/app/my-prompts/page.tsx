@@ -14,7 +14,7 @@ export default function MyPromptsPage() {
     avgLength: 0,
     lastUpdate: null as string | null,
   });
-  const [userPrompts, setUserPrompts] = useState<{ id: string; title: string; description: string; prompt: string; likes: number; created_at: string; updated_at: string; category: string; tags: string[]; image_url: string; author: string }[]>([]);
+  const [userPrompts, setUserPrompts] = useState<{ id: string; title: string; description: string; prompt: string; likes: number; created_at: string; updated_at: string; category: string; tags: string[]; image_url: string; author: string; approval_status: 'pending' | 'approved' | 'rejected'; rejection_reason: string | null }[]>([]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -33,21 +33,22 @@ export default function MyPromptsPage() {
     if (!user) return;
 
     try {
-      // Get user's prompts (include id for later computations)
-      const { data: prompts, error: promptsError } = await supabase
+      // Get user's approved prompts only for stats
+      const { data: approvedPrompts, error: promptsError } = await supabase
         .from('prompts')
         .select('id, likes, prompt, created_at, updated_at')
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .eq('approval_status', 'approved');
 
       if (promptsError) throw promptsError;
 
-      const totalPrompts = prompts?.length || 0;
-      const totalLikes = (prompts || []).reduce((acc: number, p: { likes?: number }) => acc + (p.likes || 0), 0);
+      const totalPrompts = approvedPrompts?.length || 0;
+      const totalLikes = (approvedPrompts || []).reduce((acc: number, p: { likes?: number }) => acc + (p.likes || 0), 0);
       const avgLength = totalPrompts > 0 
-        ? Math.round((prompts || []).reduce((acc: number, p: { prompt?: string }) => acc + (p.prompt?.split(' ').length || 0), 0) / totalPrompts) || 0
+        ? Math.round((approvedPrompts || []).reduce((acc: number, p: { prompt?: string }) => acc + (p.prompt?.split(' ').length || 0), 0) / totalPrompts) || 0
         : 0;
       const lastUpdate = totalPrompts > 0 
-        ? new Date(Math.max(...(prompts || []).map((p: { updated_at: string }) => new Date(p.updated_at).getTime()))).toLocaleDateString()
+        ? new Date(Math.max(...(approvedPrompts || []).map((p: { updated_at: string }) => new Date(p.updated_at).getTime()))).toLocaleDateString()
         : null;
 
       setUserStats({ totalPrompts, totalLikes, avgLength, lastUpdate });
@@ -64,7 +65,7 @@ export default function MyPromptsPage() {
         .from('prompts')
         .select('*')
         .eq('user_id', user.id)
-        .order('likes', { ascending: false });
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       setUserPrompts(data || []);
@@ -76,6 +77,39 @@ export default function MyPromptsPage() {
   useEffect(() => {
     fetchUserPrompts();
   }, [user]);
+
+  const getStatusColor = (status: 'pending' | 'approved' | 'rejected') => {
+    switch (status) {
+      case 'pending': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'approved': return 'bg-green-100 text-green-800 border-green-200';
+      case 'rejected': return 'bg-red-100 text-red-800 border-red-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  const getStatusIcon = (status: 'pending' | 'approved' | 'rejected') => {
+    switch (status) {
+      case 'pending': 
+        return (
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        );
+      case 'approved': 
+        return (
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+        );
+      case 'rejected': 
+        return (
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        );
+      default: return null;
+    }
+  };
 
   if (authLoading) {
     return (
@@ -168,22 +202,45 @@ export default function MyPromptsPage() {
                   </div>
 
                   <div className="space-y-4">
-                    {userPrompts.map((prompt: { id: string; title: string; description: string; prompt: string; likes: number; created_at: string; updated_at: string; category: string; tags: string[]; image_url: string; author: string }) => (
-                      <div key={prompt.id} className="p-4 rounded-xl border bg-white  border-gray-200 ">
-                        <div>
-                          <h3 className="font-semibold mb-2">{prompt.title}</h3>
-                          <p className="text-sm mb-3 text-gray-600 ">
-                            {prompt.description}
-                          </p>
-                          <div className="flex items-center space-x-4 text-sm text-gray-500">
-                            <span className="flex items-center">
-                              <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                              </svg>
-                              {prompt.likes} likes
-                            </span>
-                            <span>{new Date(prompt.created_at).toLocaleDateString()}</span>
+                    {userPrompts.map((prompt) => (
+                      <div key={prompt.id} className="p-4 rounded-xl border bg-white border-gray-200">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1">
+                            <h3 className="font-semibold mb-2">{prompt.title}</h3>
+                            <p className="text-sm mb-3 text-gray-600">
+                              {prompt.description}
+                            </p>
                           </div>
+                          <div className={`flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(prompt.approval_status)}`}>
+                            {getStatusIcon(prompt.approval_status)}
+                            <span className="capitalize">{prompt.approval_status}</span>
+                          </div>
+                        </div>
+                        
+                        {prompt.approval_status === 'rejected' && prompt.rejection_reason && (
+                          <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                            <div className="flex items-start">
+                              <svg className="w-4 h-4 text-red-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                              </svg>
+                              <div>
+                                <p className="text-sm font-medium text-red-800">Rejection Reason:</p>
+                                <p className="text-sm text-red-700">{prompt.rejection_reason}</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        
+                        <div className="flex items-center space-x-4 text-sm text-gray-500">
+                          <span className="flex items-center">
+                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                            </svg>
+                            {prompt.likes} likes
+                          </span>
+                          <span>{new Date(prompt.created_at).toLocaleDateString()}</span>
+                          <span className="text-xs text-gray-400">•</span>
+                          <span className="text-xs">{prompt.category}</span>
                         </div>
                       </div>
                     ))}
@@ -219,7 +276,7 @@ export default function MyPromptsPage() {
                   <span>{new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 ">PROMPTS</span>
+                  <span className="text-gray-600 ">APPROVED PROMPTS</span>
                   <span>{userStats.totalPrompts}</span>
                 </div>
                 <div className="flex justify-between">
@@ -242,7 +299,7 @@ export default function MyPromptsPage() {
                       <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
-                      <span className="font-medium">{userStats.totalPrompts} published prompts</span>
+                      <span className="font-medium">{userStats.totalPrompts} approved prompts</span>
                     </div>
                   </div>
                 </div>
