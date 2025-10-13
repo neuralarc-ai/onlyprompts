@@ -54,8 +54,34 @@ export default function AdminContactPage() {
 
   const updateMessageStatus = async (messageId: string, newStatus: ContactMessage['status']) => {
     try {
-      // This would require a PATCH endpoint - for now we'll just refetch
-      await fetchMessages();
+      const response = await fetch(`/api/contact/${messageId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update status');
+      }
+
+      // Update the local state immediately for better UX
+      setMessages(prevMessages => 
+        prevMessages.map(msg => 
+          msg.id === messageId 
+            ? { ...msg, status: newStatus, updated_at: new Date().toISOString() }
+            : msg
+        )
+      );
+
+      // Also update selected message if it's the same one
+      if (selectedMessage && selectedMessage.id === messageId) {
+        setSelectedMessage(prev => prev ? { ...prev, status: newStatus } : null);
+      }
+
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
@@ -195,20 +221,38 @@ export default function AdminContactPage() {
                         {formatDate(message.created_at)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button
-                          onClick={() => setSelectedMessage(message)}
-                          className="text-black hover:text-gray-600 mr-3"
-                        >
-                          View
-                        </button>
-                        {message.status === 'new' && (
+                        <div className="flex space-x-2">
                           <button
-                            onClick={() => updateMessageStatus(message.id, 'read')}
-                            className="text-blue-600 hover:text-blue-800"
+                            onClick={() => setSelectedMessage(message)}
+                            className="text-black hover:text-gray-600"
                           >
-                            Mark Read
+                            View
                           </button>
-                        )}
+                          {message.status === 'new' && (
+                            <button
+                              onClick={() => updateMessageStatus(message.id, 'read')}
+                              className="text-blue-600 hover:text-blue-800"
+                            >
+                              Mark Read
+                            </button>
+                          )}
+                          {message.status === 'read' && (
+                            <button
+                              onClick={() => updateMessageStatus(message.id, 'replied')}
+                              className="text-green-600 hover:text-green-800"
+                            >
+                              Mark Replied
+                            </button>
+                          )}
+                          {message.status === 'replied' && (
+                            <button
+                              onClick={() => updateMessageStatus(message.id, 'closed')}
+                              className="text-gray-600 hover:text-gray-800"
+                            >
+                              Close
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -270,22 +314,55 @@ export default function AdminContactPage() {
                   </div>
                 </div>
 
-                <div className="flex space-x-3 pt-4">
+                <div className="flex flex-wrap gap-3 pt-4">
                   <a
                     href={`mailto:${selectedMessage.email}?subject=Re: ${selectedMessage.subject}`}
                     className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
                   >
                     Reply via Email
                   </a>
+                  
                   {selectedMessage.status === 'new' && (
                     <button
                       onClick={() => {
                         updateMessageStatus(selectedMessage.id, 'read');
-                        setSelectedMessage({ ...selectedMessage, status: 'read' });
                       }}
                       className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                     >
                       Mark as Read
+                    </button>
+                  )}
+                  
+                  {selectedMessage.status === 'read' && (
+                    <button
+                      onClick={() => {
+                        updateMessageStatus(selectedMessage.id, 'replied');
+                      }}
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                    >
+                      Mark as Replied
+                    </button>
+                  )}
+                  
+                  {selectedMessage.status === 'replied' && (
+                    <button
+                      onClick={() => {
+                        updateMessageStatus(selectedMessage.id, 'closed');
+                      }}
+                      className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                    >
+                      Close Message
+                    </button>
+                  )}
+                  
+                  {selectedMessage.status === 'closed' && (
+                    <button
+                      onClick={() => {
+                        updateMessageStatus(selectedMessage.id, 'new');
+                      }}
+                      className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+                    >
+                      Reopen Message
                     </button>
                   )}
                 </div>

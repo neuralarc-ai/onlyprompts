@@ -117,13 +117,30 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    // This endpoint is for admin use - you might want to add authentication
+    // This endpoint is for admin use - using service role for admin access
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status') || 'all';
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
 
-    let query = supabase
+    // Use service role for admin operations
+    const { createClient } = await import('@supabase/supabase-js');
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    
+    if (!serviceRoleKey) {
+      console.error('Service role key not found');
+      return NextResponse.json(
+        { error: 'Service role key not configured' },
+        { status: 500 }
+      );
+    }
+
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      serviceRoleKey
+    );
+
+    let query = supabaseAdmin
       .from('contact_messages')
       .select('*')
       .order('created_at', { ascending: false })
@@ -138,12 +155,13 @@ export async function GET(request: NextRequest) {
     if (error) {
       console.error('Error fetching contact messages:', error);
       return NextResponse.json(
-        { error: 'Failed to fetch contact messages' },
+        { error: 'Failed to fetch contact messages', details: error.message },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({ messages: data });
+    console.log(`Fetched ${data?.length || 0} contact messages`);
+    return NextResponse.json({ messages: data || [] });
 
   } catch (error) {
     console.error('Error fetching contact messages:', error);
