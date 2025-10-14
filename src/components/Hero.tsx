@@ -76,24 +76,24 @@ export default function Hero() {
           </form>
 
           {/* Stats */}
-          <div className="flex justify-center items-center space-x-12 max-w-2xl mx-auto mb-8">
-            <div className="text-center">
+          <div className="flex justify-center items-center space-x-8 max-w-2xl mx-auto mb-8">
+            <div className="bg-white rounded-full px-6 py-4 shadow-lg border border-gray-200 text-center">
               <div className="text-3xl font-bold text-gray-900 mb-1">
                 {loading ? '...' : formatNumber(stats.prompts)}
               </div>
-              <div className="text-gray-600 text-sm">AI Prompts</div>
+              <div className="text-gray-600 text-sm">Total AI prompts shared</div>
             </div>
-            <div className="text-center">
+            <div className="bg-white rounded-full px-6 py-4 shadow-lg border border-gray-200 text-center">
               <div className="text-3xl font-bold text-gray-900 mb-1">
                 {loading ? '...' : formatNumber(stats.creators)}
               </div>
-              <div className="text-gray-600 text-sm">Creators</div>
+              <div className="text-gray-600 text-sm">Creators contributing</div>
             </div>
-            <div className="text-center">
+            <div className="bg-white rounded-full px-6 py-4 shadow-lg border border-gray-200 text-center">
               <div className="text-3xl font-bold text-gray-900 mb-1">
-                {loading ? '...' : formatNumber(stats.categories)}
+                {loading ? '...' : formatNumber(stats.likes)}
               </div>
-              <div className="text-gray-600 text-sm">Categories</div>
+              <div className="text-gray-600 text-sm">Total likes given</div>
             </div>
           </div>
 

@@ -5,14 +5,14 @@ import { useState, useEffect } from 'react';
 interface Stats {
   prompts: number;
   creators: number;
-  categories: number;
+  likes: number;
 }
 
 export function useStats() {
   const [stats, setStats] = useState<Stats>({
     prompts: 0,
     creators: 0,
-    categories: 0
+    likes: 0
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

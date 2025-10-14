@@ -19,20 +19,15 @@ export async function GET() {
     const uniqueCreators = new Set(creatorsData?.map(item => item.user_id) || []);
     const creatorsCount = uniqueCreators.size;
 
-    // Get categories count (unique categories from approved prompts only)
-    const { data: categoriesData } = await supabase
-      .from('prompts')
-      .select('category')
-      .eq('approval_status', 'approved')
-      .not('category', 'is', null);
-    
-    const uniqueCategories = new Set(categoriesData?.map(item => item.category) || []);
-    const categoriesCount = uniqueCategories.size;
+    // Get total likes count from likes table
+    const { count: likesCount } = await supabase
+      .from('likes')
+      .select('*', { count: 'exact', head: true });
 
     return NextResponse.json({
       prompts: promptsCount || 0,
       creators: creatorsCount,
-      categories: categoriesCount
+      likes: likesCount || 0
     });
   } catch (error) {
     console.error('Error fetching stats:', error);

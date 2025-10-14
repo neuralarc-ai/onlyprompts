@@ -80,7 +80,7 @@ export default function AboutPage() {
                 <div className="text-4xl font-bold mb-2">
                   {loading ? '...' : formatNumber(stats.prompts)}
                 </div>
-                <div className="text-gray-300">AI Prompts</div>
+                <div className="text-gray-300">Total AI prompts shared</div>
               </div>
               <div>
                 <div className="text-4xl font-bold mb-2">
@@ -90,9 +90,9 @@ export default function AboutPage() {
               </div>
               <div>
                 <div className="text-4xl font-bold mb-2">
-                  {loading ? '...' : formatNumber(stats.categories)}
+                  {loading ? '...' : formatNumber(stats.likes)}
                 </div>
-                <div className="text-gray-300">Categories</div>
+                <div className="text-gray-300">Total likes given</div>
               </div>
               <div>
                 <div className="text-4xl font-bold mb-2">100K+</div>
