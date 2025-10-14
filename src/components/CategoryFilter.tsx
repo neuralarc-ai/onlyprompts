@@ -25,7 +25,6 @@ export default function CategoryFilter({ selectedCategory, onCategoryChange }: C
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-gray-900">Filter by Category</h2>
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"

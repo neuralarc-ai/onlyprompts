@@ -31,7 +31,6 @@ export async function PUT(
     const updates: Record<string, any> = {}
     
     if (body.title !== undefined) updates.title = body.title
-    if (body.description !== undefined) updates.description = body.description
     if (body.prompt !== undefined) updates.prompt = body.prompt
     if (body.imageUrl !== undefined || body.image_url !== undefined) {
       updates.image_url = body.imageUrl || body.image_url

@@ -46,24 +46,57 @@ export default function CategoriesPage() {
     limit: 12
   });
 
-  // Filter prompts based on selected tags
+  // Filter prompts based on selected tags - ALL selected tags must match
   const filteredPrompts = allPrompts.filter(prompt => {
     if (selectedTags.length === 0) return true;
     
-    // Check if any of the selected tags match the prompt's category or are in the prompt's title/description
-    return selectedTags.some(tag => 
-      prompt.category?.toLowerCase().includes(tag.toLowerCase()) ||
-      prompt.title?.toLowerCase().includes(tag.toLowerCase()) ||
-      prompt.description?.toLowerCase().includes(tag.toLowerCase())
-    );
+    // Debug logging
+    if (selectedTags.length > 0) {
+      console.log('Filtering prompt:', prompt.title, 'Tags:', prompt.tags, 'Category:', prompt.category);
+    }
+    
+    // Check if ALL selected tags match the prompt
+    return selectedTags.every(tag => {
+      const lowerTag = tag.toLowerCase();
+      
+      // Check if tag matches any of the prompt's tags (exact match or contains)
+      const tagMatch = prompt.tags?.some(promptTag => 
+        promptTag.toLowerCase() === lowerTag || 
+        promptTag.toLowerCase().includes(lowerTag) ||
+        lowerTag.includes(promptTag.toLowerCase())
+      );
+      
+      // Check if tag matches category (exact match or contains)
+      const categoryMatch = prompt.category?.toLowerCase() === lowerTag ||
+        prompt.category?.toLowerCase().includes(lowerTag);
+      
+      // Check if tag matches title (contains)
+      const titleMatch = prompt.title?.toLowerCase().includes(lowerTag);
+      
+      // Check if tag matches prompt content (contains)
+      const promptMatch = prompt.prompt?.toLowerCase().includes(lowerTag);
+      
+      const matches = tagMatch || categoryMatch || titleMatch || promptMatch;
+      
+      if (matches) {
+        console.log(`Tag "${tag}" matched prompt "${prompt.title}"`);
+      } else {
+        console.log(`Tag "${tag}" did NOT match prompt "${prompt.title}"`);
+      }
+      
+      return matches;
+    });
   });
 
   const handleTagToggle = (tag: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
+    setSelectedTags(prev => {
+      const newTags = prev.includes(tag) 
         ? prev.filter(t => t !== tag)
-        : [...prev, tag]
-    );
+        : [...prev, tag];
+      
+      console.log('Selected tags:', newTags);
+      return newTags;
+    });
   };
 
   const clearFilters = () => {
