@@ -17,7 +17,9 @@ export const metadata: Metadata = {
   title: "OnlyPrompts - AI Prompt Gallery",
   description: "Discover and share the best AI prompts for creative inspiration",
   icons: {
-    icon: "/favicon.svg",
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/app-icon.png",
   },
 };
 

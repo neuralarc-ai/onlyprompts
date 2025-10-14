@@ -16,7 +16,7 @@ export default function Logo({ className = '', size = 'md' }: LogoProps) {
   return (
     <div className={`${sizeClasses[size]} ${className}`}>
       <Image
-        src="/nanologo.jpg"
+        src="/app-logo.png"
         alt="OnlyPrompts Logo"
         width={size === 'sm' ? 24 : size === 'md' ? 32 : 48}
         height={size === 'sm' ? 24 : size === 'md' ? 32 : 48}
