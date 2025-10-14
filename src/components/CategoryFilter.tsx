@@ -5,9 +5,6 @@ import { useState } from 'react';
 const categories = [
   'All',
   'Art & Design',
-  'Writing',
-  'Marketing',
-  'Code',
   'Photography',
   'Music',
   'Business',
@@ -50,12 +47,12 @@ export default function CategoryFilter({ selectedCategory, onCategoryChange }: C
       </div>
 
       <div className={`${isOpen ? 'block' : 'hidden lg:block'}`}>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-11 gap-2">
+        <div className="flex justify-between gap-1">
           {categories.map((category) => (
             <button
               key={category}
               onClick={() => onCategoryChange(category)}
-              className={`px-4 py-2 rounded-3xl text-sm font-medium transition-all duration-200 whitespace-nowrap h-9 flex items-center justify-center leading-none ${
+              className={`flex-1 px-3 py-2 rounded-3xl text-sm font-medium transition-all duration-200 whitespace-nowrap h-9 flex items-center justify-center leading-none ${
                 selectedCategory === category
                   ? 'bg-black text-white shadow-md'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'

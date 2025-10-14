@@ -147,13 +147,13 @@ export default function PromptModal({ isOpen, onClose, prompt }: PromptModalProp
             )}
           </div>
 
-          {/* Title and Description */}
+          {/* Title and Prompt */}
           <div className="mb-6">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
               {prompt.title}
             </h1>
             <p className="text-lg text-gray-600 leading-relaxed">
-              {prompt.description}
+              {prompt.prompt}
             </p>
           </div>
 

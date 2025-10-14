@@ -8,7 +8,6 @@ import { supabase } from '@/lib/supabase';
 interface Prompt {
   id: string;
   title: string;
-  description: string;
   prompt: string;
   author: string;
   category: string;
@@ -275,7 +274,7 @@ export default function SuperAdminDashboard() {
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">{prompt.title}</h3>
-                    <p className="text-gray-600 mb-2">{prompt.description}</p>
+                    <p className="text-gray-600 mb-2">{prompt.prompt}</p>
                     <div className="flex items-center space-x-4 text-sm text-gray-500">
                       <span>By: {prompt.author}</span>
                       <span>Category: {prompt.category}</span>
@@ -284,6 +283,13 @@ export default function SuperAdminDashboard() {
                         {prompt.approval_status}
                       </span>
                     </div>
+                  </div>
+                  {/* Like Count Display */}
+                  <div className="flex items-center space-x-1 text-gray-600 bg-gray-100 px-3 py-2 rounded-full">
+                    <svg className="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm font-medium">{prompt.likes}</span>
                   </div>
                 </div>
 

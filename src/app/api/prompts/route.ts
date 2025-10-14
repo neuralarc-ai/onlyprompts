@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Validate required fields
-    if (!body.title || !body.description || !body.prompt || !body.category) {
+    if (!body.title || !body.prompt || !body.category) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -91,7 +91,6 @@ export async function POST(request: NextRequest) {
       .insert([
         {
           title: body.title,
-          description: body.description,
           prompt: body.prompt,
           image_url: body.imageUrl || body.image_url,
           author: body.author,

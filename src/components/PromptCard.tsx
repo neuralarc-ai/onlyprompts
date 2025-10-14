@@ -182,10 +182,10 @@ export default function PromptCard({
           </button>
         </div>
 
-        {/* Description and Actions - Bottom Overlay */}
+        {/* Prompt and Actions - Bottom Overlay */}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/60 to-transparent p-4">
           <p className="text-white text-sm mb-3 line-clamp-2 drop-shadow-lg">
-            {description}
+            {prompt}
           </p>
           
           <div className="flex items-center justify-between">

@@ -10,12 +10,13 @@ import Footer from '@/components/Footer';
 
 interface FormData {
   title: string;
-  description: string;
   prompt: string;
   category: string;
   imageUrl: string;
   author: string;
   tags: string;
+  imageFile: File | null;
+  imageSource: 'url' | 'upload';
 }
 
 export default function SubmitPage() {
@@ -23,12 +24,13 @@ export default function SubmitPage() {
   const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
     title: '',
-    description: '',
     prompt: '',
     category: '',
     imageUrl: '',
     author: user?.user_metadata?.username || user?.email?.split('@')[0] || '',
-    tags: ''
+    tags: '',
+    imageFile: null,
+    imageSource: 'url'
   });
   
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -57,6 +59,23 @@ export default function SubmitPage() {
     }));
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setFormData(prev => ({
+      ...prev,
+      imageFile: file
+    }));
+  };
+
+  const handleImageSourceChange = (source: 'url' | 'upload') => {
+    setFormData(prev => ({
+      ...prev,
+      imageSource: source,
+      imageFile: source === 'url' ? null : prev.imageFile,
+      imageUrl: source === 'upload' ? '' : prev.imageUrl
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -80,6 +99,32 @@ export default function SubmitPage() {
         router.push('/');
         throw new Error('Missing access token');
       }
+
+      let finalImageUrl = formData.imageUrl;
+
+      // Handle image upload if user selected file upload
+      if (formData.imageSource === 'upload' && formData.imageFile) {
+        const uploadFormData = new FormData();
+        uploadFormData.append('file', formData.imageFile);
+
+        const uploadResponse = await fetch('/api/upload', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
+          body: uploadFormData,
+        });
+
+        if (!uploadResponse.ok) {
+          const errorData = await uploadResponse.json().catch(() => ({}));
+          const errorMessage = errorData.error || `Upload failed: ${uploadResponse.status}`;
+          throw new Error(`Failed to upload image: ${errorMessage}`);
+        }
+
+        const uploadResult = await uploadResponse.json();
+        finalImageUrl = uploadResult.url;
+      }
+
       // Call the API to create the prompt
       const response = await fetch('/api/prompts', {
         method: 'POST',
@@ -89,10 +134,9 @@ export default function SubmitPage() {
         },
         body: JSON.stringify({
           title: formData.title,
-          description: formData.description,
           prompt: formData.prompt,
           category: formData.category,
-          imageUrl: formData.imageUrl,
+          imageUrl: finalImageUrl,
           author: formData.author,
           tags: formData.tags,
           // userId will be set server-side from the verified token
@@ -167,22 +211,6 @@ export default function SubmitPage() {
               />
             </div>
 
-            {/* Description */}
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-                Description *
-              </label>
-              <textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                required
-                rows={3}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                placeholder="Brief description of what this prompt creates"
-              />
-            </div>
 
             {/* Full Prompt */}
             <div>
@@ -221,24 +249,79 @@ export default function SubmitPage() {
               </select>
             </div>
 
-            {/* Image URL */}
+            {/* Image Source Selection */}
             <div>
-              <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 mb-2">
-                Image URL *
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Image Source *
               </label>
-              <input
-                type="url"
-                id="imageUrl"
-                name="imageUrl"
-                value={formData.imageUrl}
-                onChange={handleInputChange}
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                placeholder="https://example.com/image.jpg"
-              />
-              <p className="text-sm text-gray-500 mt-1">
-                Provide a URL to an image that represents your prompt
-              </p>
+              <div className="flex space-x-4 mb-4">
+                <button
+                  type="button"
+                  onClick={() => handleImageSourceChange('url')}
+                  className={`px-4 py-2 rounded-lg border transition-colors ${
+                    formData.imageSource === 'url'
+                      ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
+                      : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  Image URL
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleImageSourceChange('upload')}
+                  className={`px-4 py-2 rounded-lg border transition-colors ${
+                    formData.imageSource === 'upload'
+                      ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
+                      : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  Upload Image
+                </button>
+              </div>
+
+              {/* Image URL Input */}
+              {formData.imageSource === 'url' && (
+                <div>
+                  <input
+                    type="url"
+                    id="imageUrl"
+                    name="imageUrl"
+                    value={formData.imageUrl}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="https://example.com/image.jpg"
+                  />
+                  <p className="text-sm text-gray-500 mt-1">
+                    Provide a URL to an image that represents your prompt
+                  </p>
+                </div>
+              )}
+
+              {/* Image Upload Input */}
+              {formData.imageSource === 'upload' && (
+                <div>
+                  <input
+                    type="file"
+                    id="imageFile"
+                    name="imageFile"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                  />
+                  <p className="text-sm text-gray-500 mt-1">
+                    Upload an image that represents your prompt (JPG, PNG, GIF, WebP)
+                  </p>
+                  {formData.imageFile && (
+                    <div className="mt-2">
+                      <p className="text-sm text-green-600">
+                        Selected: {formData.imageFile.name}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Author */}

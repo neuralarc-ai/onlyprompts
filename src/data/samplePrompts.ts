@@ -1,7 +1,6 @@
 export interface Prompt {
   id: string;
   title: string;
-  description: string;
   prompt: string;
   imageUrl: string;
   author: string;

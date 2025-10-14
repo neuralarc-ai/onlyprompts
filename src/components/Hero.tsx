@@ -17,13 +17,6 @@ export default function Hero() {
     }
   };
 
-  const handleExplorePrompts = () => {
-    // Scroll to the prompts section
-    const promptsSection = document.querySelector('main');
-    if (promptsSection) {
-      promptsSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   return (
     <section className="bg-gradient-to-br from-blue-50 via-white to-purple-50 py-12">
@@ -76,7 +69,7 @@ export default function Hero() {
           </form>
 
           {/* Stats */}
-          <div className="flex justify-center items-center space-x-8 max-w-2xl mx-auto mb-8">
+          <div className="flex justify-center items-center space-x-8 max-w-2xl mx-auto">
             <div className="bg-white rounded-full px-6 py-4 shadow-lg border border-gray-200 text-center">
               <div className="text-3xl font-bold text-gray-900 mb-1">
                 {loading ? '...' : formatNumber(stats.prompts)}
@@ -95,16 +88,6 @@ export default function Hero() {
               </div>
               <div className="text-gray-600 text-sm">Total likes given</div>
             </div>
-          </div>
-
-          {/* CTA Button */}
-          <div className="flex justify-center mt-6">
-            <button 
-              onClick={handleExplorePrompts}
-              className="bg-black text-white px-8 py-3 rounded-xl hover:bg-gray-800 transition-all duration-200 font-medium shadow-lg"
-            >
-              Explore Prompts
-            </button>
           </div>
         </div>
       </div>

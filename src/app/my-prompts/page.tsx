@@ -208,7 +208,7 @@ export default function MyPromptsPage() {
                           <div className="flex-1">
                             <h3 className="font-semibold mb-2">{prompt.title}</h3>
                             <p className="text-sm mb-3 text-gray-600">
-                              {prompt.description}
+                              {prompt.prompt}
                             </p>
                           </div>
                           <div className={`flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(prompt.approval_status)}`}>

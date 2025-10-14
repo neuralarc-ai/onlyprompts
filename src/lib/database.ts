@@ -104,7 +104,7 @@ export class DatabaseService {
       .from('prompts')
       .select('*')
       .eq('approval_status', 'approved')
-      .or(`title.ilike.%${query}%,description.ilike.%${query}%,prompt.ilike.%${query}%,author.ilike.%${query}%,category.ilike.%${query}%`)
+      .or(`title.ilike.%${query}%,prompt.ilike.%${query}%,author.ilike.%${query}%,category.ilike.%${query}%`)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1)
 

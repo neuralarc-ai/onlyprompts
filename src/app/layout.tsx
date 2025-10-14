@@ -17,9 +17,12 @@ export const metadata: Metadata = {
   title: "OnlyPrompts - AI Prompt Gallery",
   description: "Discover and share the best AI prompts for creative inspiration",
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/app-icon.png",
+    icon: [
+      { url: "/nanologo.jpg", sizes: "32x32", type: "image/jpeg" },
+      { url: "/nanologo.jpg", sizes: "16x16", type: "image/jpeg" },
+    ],
+    shortcut: "/nanologo.jpg",
+    apple: "/nanologo.jpg",
   },
 };
 
