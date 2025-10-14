@@ -26,12 +26,14 @@ interface Prompt {
 export default function SuperAdminDashboard() {
   const { user, loading: authLoading } = useAuth();
   const [prompts, setPrompts] = useState<Prompt[]>([]);
+  const [allPrompts, setAllPrompts] = useState<Prompt[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
   const [rejectReason, setRejectReason] = useState('');
   const [showRejectModal, setShowRejectModal] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState<string | null>(null);
 
   useEffect(() => {
     if (user && !authLoading) {
@@ -43,7 +45,20 @@ export default function SuperAdminDashboard() {
     if (isSuperAdmin) {
       fetchPrompts();
     }
-  }, [isSuperAdmin, filter]);
+  }, [isSuperAdmin]);
+
+  // Handle filter changes without refetching
+  useEffect(() => {
+    if (allPrompts.length > 0) {
+      let filteredData;
+      if (filter === 'all') {
+        filteredData = allPrompts;
+      } else {
+        filteredData = allPrompts.filter(p => p.approval_status === filter);
+      }
+      setPrompts(filteredData);
+    }
+  }, [filter, allPrompts]);
 
   const checkSuperAdminStatus = async () => {
     if (!user) return;
@@ -63,15 +78,19 @@ export default function SuperAdminDashboard() {
   const fetchPrompts = async () => {
     try {
       setLoading(true);
-      let data;
+      // Always fetch all prompts first
+      const allData = await DatabaseService.getAllPrompts(100, 0);
+      setAllPrompts(allData);
       
+      // Then filter based on current filter
+      let filteredData;
       if (filter === 'all') {
-        data = await DatabaseService.getAllPrompts(100, 0);
+        filteredData = allData;
       } else {
-        data = await DatabaseService.getPromptsByStatus(filter, 100, 0);
+        filteredData = allData.filter(p => p.approval_status === filter);
       }
       
-      setPrompts(data);
+      setPrompts(filteredData);
     } catch (err) {
       console.error('Error fetching prompts:', err);
       setError('Failed to fetch prompts');
@@ -85,10 +104,20 @@ export default function SuperAdminDashboard() {
     
     try {
       await DatabaseService.approvePrompt(promptId, user.id);
+      const updatedPrompt = { approval_status: 'approved' as const, reviewed_at: new Date().toISOString() };
+      
+      setAllPrompts(prev => 
+        prev.map(prompt => 
+          prompt.id === promptId 
+            ? { ...prompt, ...updatedPrompt }
+            : prompt
+        )
+      );
+      
       setPrompts(prev => 
         prev.map(prompt => 
           prompt.id === promptId 
-            ? { ...prompt, approval_status: 'approved' as const, reviewed_at: new Date().toISOString() }
+            ? { ...prompt, ...updatedPrompt }
             : prompt
         )
       );
@@ -103,15 +132,24 @@ export default function SuperAdminDashboard() {
     
     try {
       await DatabaseService.rejectPrompt(promptId, user.id, rejectReason);
+      const updatedPrompt = { 
+        approval_status: 'rejected' as const, 
+        reviewed_at: new Date().toISOString(),
+        rejection_reason: rejectReason
+      };
+      
+      setAllPrompts(prev => 
+        prev.map(prompt => 
+          prompt.id === promptId 
+            ? { ...prompt, ...updatedPrompt }
+            : prompt
+        )
+      );
+      
       setPrompts(prev => 
         prev.map(prompt => 
           prompt.id === promptId 
-            ? { 
-                ...prompt, 
-                approval_status: 'rejected' as const, 
-                reviewed_at: new Date().toISOString(),
-                rejection_reason: rejectReason
-              }
+            ? { ...prompt, ...updatedPrompt }
             : prompt
         )
       );
@@ -120,6 +158,27 @@ export default function SuperAdminDashboard() {
     } catch (err) {
       console.error('Error rejecting prompt:', err);
       setError('Failed to reject prompt');
+    }
+  };
+
+  const handleDelete = async (promptId: string) => {
+    try {
+      const response = await fetch(`/api/admin/prompts/${promptId}/delete`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete prompt');
+      }
+
+      // Remove the prompt from both states
+      setAllPrompts(prev => prev.filter(prompt => prompt.id !== promptId));
+      setPrompts(prev => prev.filter(prompt => prompt.id !== promptId));
+      setShowDeleteModal(null);
+    } catch (err) {
+      console.error('Error deleting prompt:', err);
+      setError(err instanceof Error ? err.message : 'Failed to delete prompt');
     }
   };
 
@@ -183,10 +242,10 @@ export default function SuperAdminDashboard() {
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8">
               {[
-                { key: 'pending', label: 'Pending', count: prompts.filter(p => p.approval_status === 'pending').length },
-                { key: 'approved', label: 'Approved', count: prompts.filter(p => p.approval_status === 'approved').length },
-                { key: 'rejected', label: 'Rejected', count: prompts.filter(p => p.approval_status === 'rejected').length },
-                { key: 'all', label: 'All', count: prompts.length }
+                { key: 'pending', label: 'Pending', count: allPrompts.filter(p => p.approval_status === 'pending').length },
+                { key: 'approved', label: 'Approved', count: allPrompts.filter(p => p.approval_status === 'approved').length },
+                { key: 'rejected', label: 'Rejected', count: allPrompts.filter(p => p.approval_status === 'rejected').length },
+                { key: 'all', label: 'All', count: allPrompts.length }
               ].map((tab) => (
                 <button
                   key={tab.key}
@@ -273,6 +332,17 @@ export default function SuperAdminDashboard() {
                     </button>
                   </div>
                 )}
+
+                {prompt.approval_status === 'approved' && (
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => setShowDeleteModal(prompt.id)}
+                      className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
               </div>
             ))
           )}
@@ -307,6 +377,32 @@ export default function SuperAdminDashboard() {
                     setShowRejectModal(null);
                     setRejectReason('');
                   }}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Delete Prompt</h3>
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to delete this prompt? This action cannot be undone and will also remove all associated likes.
+              </p>
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => handleDelete(showDeleteModal)}
+                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                >
+                  Delete
+                </button>
+                <button
+                  onClick={() => setShowDeleteModal(null)}
                   className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
                 >
                   Cancel
