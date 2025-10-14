@@ -35,7 +35,7 @@ export default function Header() {
               Trending
             </Link>
             <Link href="/categories" className="text-gray-700 hover:text-gray-900 transition-colors">
-              Categories
+              Explore
             </Link>
             {user && (
               <Link href="/my-prompts" className="text-gray-700 hover:text-gray-900 transition-colors">
@@ -132,7 +132,7 @@ export default function Header() {
                 className="block px-3 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Categories
+                Explore
               </Link>
               {user && (
                 <Link

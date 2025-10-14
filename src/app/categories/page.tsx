@@ -1,183 +1,219 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PromptCard from '@/components/PromptCard';
 import { usePrompts } from '@/hooks/usePrompts';
 import { useAuth } from '@/hooks/useAuth';
-import { DatabaseService } from '@/lib/database';
 
-const categories = [
-  { name: 'Art & Design', icon: '🎨', description: 'Creative visual prompts for art and design' },
-  { name: 'Writing', icon: '✍️', description: 'Content creation and writing prompts' },
-  { name: 'Marketing', icon: '📢', description: 'Marketing and advertising prompts' },
-  { name: 'Code', icon: '💻', description: 'Programming and development prompts' },
-  { name: 'Photography', icon: '📸', description: 'Photography and visual prompts' },
-  { name: 'Music', icon: '🎵', description: 'Music and audio creation prompts' },
-  { name: 'Business', icon: '💼', description: 'Business and professional prompts' },
-  { name: 'Education', icon: '🎓', description: 'Educational and learning prompts' },
-  { name: 'Gaming', icon: '🎮', description: 'Gaming and interactive prompts' },
-  { name: 'Social Media', icon: '📱', description: 'Social media content prompts' },
-  { name: 'Productivity', icon: '⚡', description: 'Productivity and efficiency prompts' },
-];
+// Tag categories inspired by Banana Prompts
+const tagCategories = {
+  'Artistic styles': [
+    'Realistic', 'Cinematic', 'Anime', 'Architecture', 'Cartoon', '3D Render', 
+    'Vector', 'Watercolor', 'Sketch / Line Art', 'Oil Painting', 'Abstract', 
+    'Surreal', 'Fashion', 'Photography', 'Portrait'
+  ],
+  'Corporate & professional': [
+    'Corporate', 'Business', 'Minimalist', 'Modern', 'Product / Poster', 
+    'Logo', 'Infographic', 'Concept art'
+  ],
+  'Genre & themes': [
+    'Fantasy', 'Sci-Fi', 'Cyberpunk', 'Retro / Vintage', 'Grunge'
+  ],
+  'Mood & tone': [
+    'Vibrant / Colorful', 'Dark / Moody', 'Elegant'
+  ],
+  'Optional add-ons': [
+    'Glitch', 'Neon', 'Flat Design'
+  ]
+};
 
 export default function CategoriesPage() {
   const { user } = useAuth();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [categoriesWithCounts, setCategoriesWithCounts] = useState<Array<{name: string, icon: string, count: number, description: string}>>([]);
-  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  // Use the prompts hook for the selected category
+  // Use the prompts hook to get all approved prompts
   const { 
-    prompts: filteredPrompts, 
+    prompts: allPrompts, 
     loading, 
     error, 
     hasMore, 
     loadMore, 
     refresh 
   } = usePrompts({
-    category: selectedCategory || undefined,
     limit: 12
   });
 
-  // Load category counts from database
-  useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        setLoadingCategories(true);
-        const dbCategories = await DatabaseService.getCategories();
-        
-        // Merge with predefined categories and add counts
-        const mergedCategories = categories.map(category => {
-          const dbCategory = dbCategories.find(db => db.name === category.name);
-          return {
-            ...category,
-            count: dbCategory?.count || 0
-          };
-        });
-        
-        setCategoriesWithCounts(mergedCategories);
-      } catch (err) {
-        console.error('Error loading categories:', err);
-        // Fallback to categories with 0 counts
-        setCategoriesWithCounts(categories.map(cat => ({ ...cat, count: 0 })));
-      } finally {
-        setLoadingCategories(false);
-      }
-    };
+  // Filter prompts based on selected tags
+  const filteredPrompts = allPrompts.filter(prompt => {
+    if (selectedTags.length === 0) return true;
+    
+    // Check if any of the selected tags match the prompt's category or are in the prompt's title/description
+    return selectedTags.some(tag => 
+      prompt.category?.toLowerCase().includes(tag.toLowerCase()) ||
+      prompt.title?.toLowerCase().includes(tag.toLowerCase()) ||
+      prompt.description?.toLowerCase().includes(tag.toLowerCase())
+    );
+  });
 
-    loadCategories();
-  }, []);
+  const handleTagToggle = (tag: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tag) 
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
+  };
 
-  // Modal functionality removed - now using direct navigation to prompt pages
+  const clearFilters = () => {
+    setSelectedTags([]);
+    setSearchQuery('');
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Header />
       
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-green-50 via-white to-blue-50 py-16">
+      {/* Hero Section - Inspired by Banana Prompts */}
+      <section className="py-16 explore-hero">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-              Browse by
-              <span className="text-black">
-                {' '}Category
-              </span>
+          <div className="text-center mb-12">
+            <h1 className="text-4xl md:text-5xl font-bold text-black mb-4">
+              Keep exploring the prompts your peers are sharing.
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Explore AI prompts organized by category. Find exactly what you&apos;re looking for, from creative arts to business applications.
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Scroll to load more AI-driven frames and the prompts that power them. Likes bubble the standouts to the top, so every new batch teaches a fresh technique.
             </p>
           </div>
+
+          {/* Search and Filter Section */}
+          <div className="bg-white border border-gray-200 rounded-xl p-8 mb-8 shadow-sm">
+            {/* Refine Search Badge */}
+            <div className="mb-4">
+              <span className="bg-black text-white px-3 py-1 rounded-lg text-xs font-semibold uppercase tracking-wide">
+                Refine Search
+              </span>
+            </div>
+
+            {/* Header */}
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
+              <div className="mb-4 lg:mb-0">
+                <h2 className="text-2xl font-bold text-black mb-2">
+                  Find the next prompt to explore
+                </h2>
+                <p className="text-gray-600">
+                  Blend keywords with style tags to surface prompts that match your vibe.
+                </p>
+              </div>
+              
+              {/* Search Bar */}
+              <div className="flex gap-3">
+                <div className="relative flex-1 lg:w-80">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Search prompts, titles, or creators"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="search-input w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                  />
+                </div>
+                <button className="bg-black text-white px-6 py-3 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-gray-800 transition-colors">
+                  Search
+                </button>
+              </div>
+            </div>
+
+            {/* Browse Tags Section */}
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                    Browse Tags
+                  </h3>
+                  {selectedTags.length > 0 && (
+                    <span className="bg-black text-white px-2 py-1 rounded-lg text-xs font-semibold uppercase tracking-wide">
+                      {selectedTags.length} ACTIVE
+                    </span>
+                  )}
+                </div>
+                {selectedTags.length > 0 && (
+                  <button
+                    onClick={clearFilters}
+                    className="text-gray-500 hover:text-gray-700 transition-colors flex items-center gap-1 text-sm"
+                  >
+                    Clear filters
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+              
+              {Object.entries(tagCategories).map(([categoryName, tags]) => (
+                <div key={categoryName}>
+                  <h4 className="text-sm font-bold text-black mb-3 uppercase tracking-wide">
+                    {categoryName}:
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {tags.map((tag) => (
+                      <button
+                        key={tag}
+                        onClick={() => handleTagToggle(tag)}
+                        className={`tag-button px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 ${
+                          selectedTags.includes(tag)
+                            ? 'selected'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200'
+                        }`}
+                      >
+                        <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
         </div>
       </section>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Categories Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
-          {loadingCategories ? (
-            // Loading state for categories
-            Array.from({ length: 8 }).map((_, index) => (
-              <div key={index} className="p-6 rounded-xl border-2 border-gray-200 bg-white animate-pulse">
-                <div className="text-4xl mb-3">⏳</div>
-                <div className="h-6 bg-gray-200 rounded mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded mb-3"></div>
-                <div className="h-4 bg-gray-200 rounded w-20"></div>
-              </div>
-            ))
-          ) : (
-            categoriesWithCounts.map((category) => (
-              <button
-                key={category.name}
-                onClick={() => setSelectedCategory(category.name)}
-                className={`p-6 rounded-xl border-2 transition-all duration-200 text-left ${
-                  selectedCategory === category.name
-                    ? 'border-black bg-gray-50 shadow-lg'
-                    : 'border-gray-200 bg-white hover:border-gray-400 hover:shadow-md'
-                }`}
-              >
-                <div className="text-4xl mb-3">{category.icon}</div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {category.name}
-                </h3>
-                <p className="text-sm text-gray-600 mb-3">
-                  {category.description}
-                </p>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-500">
-                    {category.count} prompts
-                  </span>
-                  {selectedCategory === category.name && (
-                    <div className="w-2 h-2 bg-black rounded-full"></div>
-                  )}
-                </div>
-              </button>
-            ))
-          )}
-        </div>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        {/* Prompts Section */}
+        <div>
 
-        {/* Selected Category Results */}
-        {selectedCategory && (
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">
-                {selectedCategory} Prompts
-              </h2>
+          {/* Loading State */}
+          {loading && filteredPrompts.length === 0 && (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && (
+            <div className="text-center py-12">
+              <div className="text-red-500 mb-4">Error: {error}</div>
               <button
-                onClick={() => setSelectedCategory(null)}
-                className="text-gray-500 hover:text-gray-700 transition-colors"
+                onClick={refresh}
+                className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors"
               >
-                Clear Selection
+                Try Again
               </button>
             </div>
+          )}
 
-            {/* Loading State */}
-            {loading && filteredPrompts.length === 0 && (
-              <div className="flex justify-center items-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-              </div>
-            )}
-
-            {/* Error State */}
-            {error && (
-              <div className="text-center py-12">
-                <div className="text-red-500 mb-4">Error: {error}</div>
-                <button
-                  onClick={refresh}
-                  className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors"
-                >
-                  Try Again
-                </button>
-              </div>
-            )}
-
-            {/* Prompts Grid */}
-            {!loading && !error && filteredPrompts.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredPrompts.map((prompt) => (
+          {/* Prompts Grid */}
+          {!loading && !error && filteredPrompts.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredPrompts.map((prompt) => (
+                <div key={prompt.id} className="fade-in">
                   <PromptCard
-                    key={prompt.id}
                     id={prompt.id}
                     title={prompt.title}
                     description={prompt.description}
@@ -189,64 +225,46 @@ export default function CategoriesPage() {
                     created_at={prompt.created_at}
                     userId={user?.id}
                   />
-                ))}
-              </div>
-            )}
-
-            {/* No Results State */}
-            {!loading && !error && filteredPrompts.length === 0 && (
-              <div className="text-center py-12">
-                <div className="text-6xl mb-4">🔍</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  No prompts found
-                </h3>
-                <p className="text-gray-600 mb-6">
-                  No {selectedCategory.toLowerCase()} prompts available yet. Be the first to submit one!
-                </p>
-                <button
-                  onClick={() => window.location.href = '/submit'}
-                  className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-all duration-200 font-medium"
-                >
-                  Submit a Prompt
-                </button>
-              </div>
-            )}
-
-            {/* Load More Button */}
-            {filteredPrompts.length > 0 && hasMore && (
-              <div className="text-center mt-12">
-                <button 
-                  onClick={loadMore}
-                  disabled={loading}
-                  className="bg-black text-white px-8 py-3 rounded-xl hover:bg-gray-800 transition-all duration-200 font-medium shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? 'Loading...' : 'Load More Prompts'}
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* All Categories Overview */}
-        {!selectedCategory && (
-          <div className="text-center py-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Choose a category to explore prompts
-            </h2>
-            <p className="text-gray-600 mb-8">
-              Click on any category above to see the available prompts in that area.
-            </p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
-              {categoriesWithCounts.map((category) => (
-                <div key={category.name} className="text-center">
-                  <div className="text-2xl mb-2">{category.icon}</div>
-                  <div className="text-sm font-medium text-gray-900">{category.name}</div>
-                  <div className="text-xs text-gray-500">{category.count} prompts</div>
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          )}
+
+          {/* No Results State */}
+          {!loading && !error && filteredPrompts.length === 0 && (
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">🔍</div>
+              <h3 className="text-xl font-semibold text-black mb-2">
+                {selectedTags.length > 0 ? 'No prompts found for selected tags' : 'No prompts available'}
+              </h3>
+              <p className="text-gray-600 mb-6">
+                {selectedTags.length > 0 
+                  ? 'Try selecting different tags or clear the filters to see all prompts.'
+                  : 'Be the first to submit a prompt!'
+                }
+              </p>
+              <button
+                onClick={() => window.location.href = '/submit'}
+                className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-all duration-200 font-medium"
+              >
+                Submit a Prompt
+              </button>
+            </div>
+          )}
+
+          {/* Load More Button */}
+          {filteredPrompts.length > 0 && hasMore && (
+            <div className="text-center mt-12">
+              <button 
+                onClick={loadMore}
+                disabled={loading}
+                className="bg-black text-white px-8 py-3 rounded-xl hover:bg-gray-800 transition-all duration-200 font-medium shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? 'Loading...' : 'Load More Prompts'}
+              </button>
+            </div>
+          )}
+        </div>
       </main>
 
       <Footer />
