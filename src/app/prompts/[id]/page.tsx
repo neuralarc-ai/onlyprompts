@@ -193,10 +193,10 @@ export default function PromptDetailPage() {
                 Shared by @{prompt.author}
               </p>
 
-              {/* Prompt section */}
+              {/* Prompt section with box */}
               <div className="space-y-4">
                 <h2 className="text-xl font-bold text-gray-900">PROMPT</h2>
-                <div className="bg-gray-50 rounded-xl p-6">
+                <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
                   <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
                     {prompt.prompt}
                   </p>
@@ -218,24 +218,26 @@ export default function PromptDetailPage() {
                 <span>{isCopied ? 'Copied!' : 'Copy prompt'}</span>
               </button>
 
-              {/* Like count */}
-              <div className="flex items-center space-x-2 text-gray-600">
-                <button
-                  onClick={() => prompt && toggleLike(prompt.id)}
-                  className={`flex items-center space-x-2 ${
-                    prompt && isLiked(prompt.id) ? 'text-red-500' : 'text-gray-400 hover:text-red-500'
-                  } transition-colors`}
-                >
-                  <svg
-                    className={`h-6 w-6 ${prompt && isLiked(prompt.id) ? 'fill-current' : ''}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+              {/* Like count with box */}
+              <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
+                <div className="flex items-center space-x-2 text-gray-600">
+                  <button
+                    onClick={() => prompt && toggleLike(prompt.id)}
+                    className={`flex items-center space-x-2 ${
+                      prompt && isLiked(prompt.id) ? 'text-red-500' : 'text-gray-400 hover:text-red-500'
+                    } transition-colors`}
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
-                </button>
-                <span className="font-medium">{prompt?.likes || 0} LIKE</span>
+                    <svg
+                      className={`h-6 w-6 ${prompt && isLiked(prompt.id) ? 'fill-current' : ''}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </button>
+                  <span className="font-medium">{prompt?.likes || 0} LIKES</span>
+                </div>
               </div>
             </div>
           </div>
