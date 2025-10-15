@@ -18,6 +18,7 @@ interface PromptCardProps {
   created_at?: string; // snake_case (from DB)
   createdAt?: string;  // camelCase (from sample data)
   userId?: string;
+  onLikeClick?: () => void; // Callback for when like is clicked without auth
 }
 
 export default function PromptCard({
@@ -32,7 +33,8 @@ export default function PromptCard({
   category,
   created_at,
   createdAt,
-  userId
+  userId,
+  onLikeClick
 }: PromptCardProps) {
   const router = useRouter();
   const [likeCount, setLikeCount] = useState(likes);
@@ -43,8 +45,9 @@ export default function PromptCard({
     console.log('PromptCard - handleLike called:', { id, userId, currentLikes: likeCount });
     
     if (!userId) {
-      // Redirect to login or show auth modal
-      console.log('PromptCard - User not authenticated, cannot like');
+      // Call the parent's onLikeClick callback to show auth modal
+      console.log('PromptCard - User not authenticated, calling onLikeClick');
+      onLikeClick?.();
       return;
     }
 
@@ -74,6 +77,7 @@ export default function PromptCard({
   const handleCardClick = () => {
     router.push(`/prompts/${id}`);
   };
+
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);

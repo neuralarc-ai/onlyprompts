@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useSuperAdmin } from '@/hooks/useSuperAdmin';
 import AuthModal from './AuthModal';
@@ -12,6 +13,15 @@ export default function Header() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { user, signOut } = useAuth();
   const { isSuperAdmin } = useSuperAdmin();
+  const router = useRouter();
+
+  const handleSubmitClick = () => {
+    if (!user) {
+      setShowAuthModal(true);
+    } else {
+      router.push('/submit');
+    }
+  };
 
   return (
     <header className="py-4">
@@ -42,9 +52,12 @@ export default function Header() {
                 My Prompts
               </Link>
             )}
-            <Link href="/submit" className="text-gray-700 hover:text-gray-900 transition-colors">
+            <button
+              onClick={handleSubmitClick}
+              className="text-gray-700 hover:text-gray-900 transition-colors"
+            >
               Submit
-            </Link>
+            </button>
             {isSuperAdmin && (
               <Link href="/admin/dashboard" className="text-gray-700 hover:text-gray-900 transition-colors font-medium">
                 Admin
@@ -143,13 +156,15 @@ export default function Header() {
                   My Prompts
                 </Link>
               )}
-              <Link
-                href="/submit"
-                className="block px-3 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
-                onClick={() => setIsMenuOpen(false)}
+              <button
+                onClick={() => {
+                  handleSubmitClick();
+                  setIsMenuOpen(false);
+                }}
+                className="block w-full text-left px-3 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
               >
                 Submit
-              </Link>
+              </button>
               {isSuperAdmin && (
                 <Link
                   href="/admin/dashboard"

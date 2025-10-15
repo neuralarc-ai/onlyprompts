@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import Hero from '@/components/Hero';
 import CategoryFilter from '@/components/CategoryFilter';
 import PromptCard from '@/components/PromptCard';
+import AuthModal from '@/components/AuthModal';
 // PromptModal import removed - now using direct navigation to prompt pages
 import { usePrompts } from '@/hooks/usePrompts';
 import { useAuth } from '@/hooks/useAuth';
@@ -15,6 +16,7 @@ function HomeContent() {
   const searchParams = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showAuthModal, setShowAuthModal] = useState(false);
   // Modal state removed - now using direct navigation to prompt pages
   const { user } = useAuth();
 
@@ -42,6 +44,14 @@ function HomeContent() {
   });
 
   // Modal functionality removed - now using direct navigation to prompt pages
+
+  const handleLikeClick = () => {
+    setShowAuthModal(true);
+  };
+
+  const handleAuthSuccess = () => {
+    setShowAuthModal(false);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -114,6 +124,7 @@ function HomeContent() {
               category={prompt.category}
               created_at={prompt.created_at}
               userId={user?.id}
+              onLikeClick={handleLikeClick}
             />
           ))}
           </div>
@@ -160,7 +171,12 @@ function HomeContent() {
 
       <Footer />
 
-      {/* Modal removed - now using direct navigation to prompt pages */}
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)}
+        onAuthSuccess={handleAuthSuccess}
+      />
     </div>
   );
 }

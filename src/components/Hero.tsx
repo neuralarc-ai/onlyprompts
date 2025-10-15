@@ -22,19 +22,19 @@ export default function Hero() {
 
           {/* Stats */}
           <div className="flex justify-center items-center space-x-8 max-w-4xl mx-auto mb-12">
-            <div className="bg-white rounded-full px-8 py-6 shadow-lg border border-gray-200 text-center w-72 h-24 flex flex-col justify-center">
+            <div className="bg-white/80 backdrop-blur-sm rounded-full px-8 py-6 shadow-lg border border-gray-200 text-center w-72 h-24 flex flex-col justify-center">
               <div className="text-3xl font-bold text-gray-900 mb-1">
                 {loading ? '...' : formatNumber(stats.prompts)}
               </div>
               <div className="text-gray-600 text-sm">Total AI Prompts shared</div>
             </div>
-            <div className="bg-white rounded-full px-8 py-6 shadow-lg border border-gray-200 text-center w-72 h-24 flex flex-col justify-center">
+            <div className="bg-white/80 backdrop-blur-sm rounded-full px-8 py-6 shadow-lg border border-gray-200 text-center w-72 h-24 flex flex-col justify-center">
               <div className="text-3xl font-bold text-gray-900 mb-1">
                 {loading ? '...' : formatNumber(stats.creators)}
               </div>
               <div className="text-gray-600 text-sm">Creators contributing</div>
             </div>
-            <div className="bg-white rounded-full px-8 py-6 shadow-lg border border-gray-200 text-center w-72 h-24 flex flex-col justify-center">
+            <div className="bg-white/80 backdrop-blur-sm rounded-full px-8 py-6 shadow-lg border border-gray-200 text-center w-72 h-24 flex flex-col justify-center">
               <div className="text-3xl font-bold text-gray-900 mb-1">
                 {loading ? '...' : formatNumber(stats.likes)}
               </div>

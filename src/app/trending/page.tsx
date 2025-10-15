@@ -4,11 +4,13 @@ import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PromptCard from '@/components/PromptCard';
+import AuthModal from '@/components/AuthModal';
 import { usePrompts } from '@/hooks/usePrompts';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function TrendingPage() {
   const { user } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
   
   // Use the prompts hook with trending enabled
   const { 
@@ -24,6 +26,14 @@ export default function TrendingPage() {
   });
 
   // Modal functionality removed - now using direct navigation to prompt pages
+
+  const handleLikeClick = () => {
+    setShowAuthModal(true);
+  };
+
+  const handleAuthSuccess = () => {
+    setShowAuthModal(false);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -46,17 +56,29 @@ export default function TrendingPage() {
             {/* Trending Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
               <div className="text-center">
-                <div className="text-3xl font-bold text-gray-900 mb-2">🔥</div>
+                <div className="flex justify-center mb-1">
+                  <svg className="w-8 h-8 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                  </svg>
+                </div>
                 <div className="text-lg font-semibold text-gray-900 mb-1">Most Liked</div>
                 <div className="text-gray-600">Community favorites</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-gray-900 mb-2">📈</div>
+                <div className="flex justify-center mb-1">
+                  <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                  </svg>
+                </div>
                 <div className="text-lg font-semibold text-gray-900 mb-1">Rising Fast</div>
                 <div className="text-gray-600">Growing popularity</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-gray-900 mb-2">⭐</div>
+                <div className="flex justify-center mb-1">
+                  <svg className="w-8 h-8 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                </div>
                 <div className="text-lg font-semibold text-gray-900 mb-1">Top Rated</div>
                 <div className="text-gray-600">Highest quality</div>
               </div>
@@ -115,6 +137,7 @@ export default function TrendingPage() {
                   category={prompt.category}
                   created_at={prompt.created_at}
                   userId={user?.id}
+                  onLikeClick={handleLikeClick}
                 />
               </div>
             ))}
@@ -124,7 +147,11 @@ export default function TrendingPage() {
         {/* No Results State */}
         {!loading && !error && trendingPrompts.length === 0 && (
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">🔥</div>
+            <div className="flex justify-center mb-4">
+              <svg className="w-16 h-16 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+            </div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
               No trending prompts yet
             </h3>
@@ -155,6 +182,13 @@ export default function TrendingPage() {
       </main>
 
       <Footer />
+
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)}
+        onAuthSuccess={handleAuthSuccess}
+      />
     </div>
   );
 }

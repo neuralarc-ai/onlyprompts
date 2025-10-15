@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import AuthModal from '@/components/AuthModal';
 import { DatabaseService } from '@/lib/database';
 import { useLikes } from '@/hooks/useLikes';
 import { useAuth } from '@/hooks/useAuth';
@@ -30,6 +31,7 @@ export default function PromptDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const { isLiked, toggleLike } = useLikes(user?.id);
 
   useEffect(() => {
@@ -66,6 +68,20 @@ export default function PromptDetailPage() {
 
   const handleBackToGallery = () => {
     router.back();
+  };
+
+  const handleLikeClick = () => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+    if (prompt) {
+      toggleLike(prompt.id);
+    }
+  };
+
+  const handleAuthSuccess = () => {
+    setShowAuthModal(false);
   };
 
   if (loading) {
@@ -222,7 +238,7 @@ export default function PromptDetailPage() {
               <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
                 <div className="flex items-center space-x-2 text-gray-600">
                   <button
-                    onClick={() => prompt && toggleLike(prompt.id)}
+                    onClick={handleLikeClick}
                     className={`flex items-center space-x-2 ${
                       prompt && isLiked(prompt.id) ? 'text-red-500' : 'text-gray-400 hover:text-red-500'
                     } transition-colors`}
@@ -245,6 +261,13 @@ export default function PromptDetailPage() {
       </main>
 
       <Footer />
+
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)}
+        onAuthSuccess={handleAuthSuccess}
+      />
     </div>
   );
 }
