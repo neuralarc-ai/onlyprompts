@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { DatabaseService } from '@/lib/database'
+import { EmailService } from '@/lib/emailService'
 import { createClient } from '@supabase/supabase-js'
 
 export async function GET(request: NextRequest) {
@@ -112,6 +113,30 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('Supabase insert error:', error)
       return NextResponse.json({ error: 'Failed to create prompt' }, { status: 500 })
+    }
+
+    // Send email notification to super admins
+    try {
+      const superAdminEmails = await DatabaseService.getSuperAdminEmails()
+      
+      if (superAdminEmails.length > 0) {
+        await EmailService.sendPromptApprovalNotification(
+          {
+            id: data.id,
+            title: data.title,
+            author: data.author,
+            category: data.category,
+            prompt: data.prompt
+          },
+          superAdminEmails
+        )
+        console.log('📧 Email notification sent to super admins')
+      } else {
+        console.log('⚠️ No super admin emails found for notification')
+      }
+    } catch (emailError) {
+      // Don't fail the prompt creation if email fails
+      console.error('Failed to send email notification:', emailError)
     }
 
     return NextResponse.json(data, { status: 201 })

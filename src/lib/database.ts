@@ -259,6 +259,15 @@ export class DatabaseService {
     return data
   }
 
+  static async getSuperAdminEmails() {
+    const { data, error } = await supabase
+      .from('super_admins')
+      .select('email')
+
+    if (error) throw error
+    return data.map(admin => admin.email)
+  }
+
   static async getPendingPrompts(limit: number = 50, offset: number = 0) {
     const { data, error } = await supabase
       .from('pending_prompts')
