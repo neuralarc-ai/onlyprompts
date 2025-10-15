@@ -27,34 +27,67 @@ export default function PrivacyPage() {
               <strong>Last updated:</strong> October 2025
             </p>
 
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Information We Collect</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Information We Collect</h2>
+            <p className="text-gray-600 mb-4">
+              <strong>Personal Data:</strong> Name, email, company, contact details.
+            </p>
+            <p className="text-gray-600 mb-4">
+              <strong>Technical Data:</strong> IP address, browser type, device identifiers, usage logs.
+            </p>
             <p className="text-gray-600 mb-6">
-              We collect information you provide directly to us, such as when you submit prompts, 
-              create an account, or contact us for support.
+              <strong>Cookies:</strong> We use cookies for analytics and personalization.
             </p>
 
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">How We Use Your Information</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">2. Use of Information</h2>
+            <p className="text-gray-600 mb-4">
+              We use the information to:
+            </p>
+            <ul className="text-gray-600 mb-6 list-disc pl-6 space-y-2">
+              <li>Provide, maintain, and improve our Services;</li>
+              <li>Process transactions and communicate with you;</li>
+              <li>Monitor usage trends and enhance security;</li>
+              <li>Comply with legal obligations.</li>
+            </ul>
+
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">3. Legal Basis for Processing</h2>
             <p className="text-gray-600 mb-6">
-              We use the information we collect to provide, maintain, and improve our services, 
-              process submissions, and communicate with you.
+              Where applicable, we process your data on the basis of your consent, our contractual obligations, compliance with legal obligations, or legitimate interests.
             </p>
 
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Information Sharing</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">4. Data Sharing</h2>
+            <p className="text-gray-600 mb-4">
+              We do not sell or rent your data. We may share it with:
+            </p>
+            <ul className="text-gray-600 mb-6 list-disc pl-6 space-y-2">
+              <li>Authorized service providers (under strict confidentiality);</li>
+              <li>Legal or regulatory authorities, when required;</li>
+              <li>Affiliates and successors in interest, in the event of a business transfer.</li>
+            </ul>
+
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">5. Data Retention</h2>
             <p className="text-gray-600 mb-6">
-              We do not sell, trade, or otherwise transfer your personal information to third parties 
-              without your consent, except as described in this policy.
+              We retain your data only as long as necessary to fulfill the purposes outlined in this Policy, unless a longer retention period is required by law.
             </p>
 
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Data Security</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">6. Security</h2>
             <p className="text-gray-600 mb-6">
-              We implement appropriate security measures to protect your personal information against 
-              unauthorized access, alteration, disclosure, or destruction.
+              We implement appropriate administrative, technical, and physical safeguards to protect your information against unauthorized access or disclosure.
             </p>
 
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Contact Us</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">7. Your Rights</h2>
             <p className="text-gray-600 mb-6">
-              If you have any questions about this Privacy Policy, please contact us at 
-              <a href="mailto:privacy@onlyprompts.com" className="text-blue-600 hover:underline"> privacy@onlyprompts.com</a>.
+              Depending on your jurisdiction, you may have rights to access, correct, delete, or restrict the processing of your data. Please contact us at 
+              <a href="mailto:support@onlyprompts.com" className="text-blue-600 hover:underline"> support@onlyprompts.com</a>.
+            </p>
+
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">8. International Transfers</h2>
+            <p className="text-gray-600 mb-6">
+              If your data is transferred outside of India, we ensure appropriate safeguards are in place, including data processing agreements and, where applicable, standard contractual clauses.
+            </p>
+
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">9. Changes</h2>
+            <p className="text-gray-600 mb-6">
+              We may update this Privacy Policy periodically. We encourage you to review this page regularly.
             </p>
           </div>
         </div>

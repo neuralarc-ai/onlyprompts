@@ -150,24 +150,21 @@ export default function PromptCard({
           </div>
         )}
 
-        {/* Category Tag */}
+        {/* Title Tag */}
         <div className="absolute top-3 left-3">
-          <span className="bg-white/90 backdrop-blur-sm text-xs font-medium px-2 py-1 rounded-full text-gray-700">
-            {category}
+          <span className="bg-black/30 backdrop-blur-sm text-xs font-medium px-2 py-1 rounded-full text-white line-clamp-1 max-w-[200px]">
+            {title}
           </span>
         </div>
 
-        {/* Title and Like Count - Top Right */}
-        <div className="absolute top-3 right-3 text-right">
-          <h3 className="text-white font-bold text-sm mb-1 drop-shadow-lg line-clamp-1">
-            {title}
-          </h3>
+        {/* Like Count - Top Right */}
+        <div className="absolute top-3 right-3">
           <button
             onClick={(e) => {
               e.stopPropagation();
               handleLike();
             }}
-            className="flex items-center justify-end space-x-1 hover:opacity-80 transition-opacity"
+            className="flex items-center space-x-1 hover:opacity-80 transition-opacity"
           >
             <svg
               className={`h-4 w-4 text-white drop-shadow-lg ${userLiked(id) ? 'fill-current' : ''}`}

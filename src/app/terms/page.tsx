@@ -27,40 +27,60 @@ export default function TermsPage() {
               <strong>Last updated:</strong> October 2025
             </p>
 
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Acceptance of Terms</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Eligibility and Account Responsibility</h2>
             <p className="text-gray-600 mb-6">
-              By accessing and using OnlyPrompts, you accept and agree to be bound by the terms and 
-              provision of this agreement.
+              You must be at least 18 years of age and capable of entering into a legally binding contract to access or use the Services. You are responsible for maintaining the confidentiality of your account credentials and for all activities occurring under your account.
             </p>
 
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Use License</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">2. License to Use Services</h2>
             <p className="text-gray-600 mb-6">
-              Permission is granted to temporarily use OnlyPrompts for personal, non-commercial transitory 
-              viewing only. This is the grant of a license, not a transfer of title.
+              Subject to your compliance with these Terms, OnlyPrompts grants you a limited, non-exclusive, non-transferable, revocable license to access and use the Services solely for your internal business purposes. You shall not use the Services to develop competing products or reverse engineer any aspect of the platform.
             </p>
 
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Content Guidelines</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">3. Prohibited Conduct</h2>
             <p className="text-gray-600 mb-6">
-              You agree to submit only appropriate, lawful content. Content that is harmful, 
-              offensive, or violates any laws is prohibited.
+              You shall not:
+            </p>
+            <ul className="text-gray-600 mb-6 list-disc pl-6 space-y-2">
+              <li>Use the Services in any manner that infringes any intellectual property or proprietary rights of any party;</li>
+              <li>Use or access the Services to violate any applicable law or regulation;</li>
+              <li>Introduce malware or harmful code, scrape data, or interfere with service functionality;</li>
+              <li>Misrepresent your identity or affiliation.</li>
+            </ul>
+
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">4. Ownership and Intellectual Property</h2>
+            <p className="text-gray-600 mb-6">
+              All content, trademarks, and software associated with the Services are the exclusive property of OnlyPrompts or its licensors. No rights are granted except as explicitly set forth herein.
             </p>
 
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Disclaimer</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">5. Third-Party Integrations</h2>
             <p className="text-gray-600 mb-6">
-              The materials on OnlyPrompts are provided on an &apos;as is&apos; basis. OnlyPrompts makes no warranties, 
-              expressed or implied, and hereby disclaims and negates all other warranties.
+              The Services may contain links or integrations with third-party platforms. OnlyPrompts is not responsible for the content, functionality, or privacy practices of such third parties.
             </p>
 
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Limitations</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">6. Disclaimers</h2>
             <p className="text-gray-600 mb-6">
-              In no event shall OnlyPrompts or its suppliers be liable for any damages arising out of
-              the use or inability to use the materials on OnlyPrompts.
+              The Services are provided &quot;as is&quot; and &quot;as available.&quot; OnlyPrompts makes no warranties or representations, express or implied, regarding the Services, including but not limited to merchantability, fitness for a particular purpose, accuracy, or non-infringement.
             </p>
 
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Contact Information</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">7. Limitation of Liability</h2>
             <p className="text-gray-600 mb-6">
-              If you have any questions about these Terms of Service, please contact us at 
-              <a href="mailto:legal@onlyprompts.com" className="text-blue-600 hover:underline"> legal@onlyprompts.com</a>.
+              To the maximum extent permitted by applicable law, OnlyPrompts shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or for loss of profits or revenue, arising from or related to your use of the Services.
+            </p>
+
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">8. Indemnification</h2>
+            <p className="text-gray-600 mb-6">
+              You agree to indemnify, defend, and hold harmless OnlyPrompts, its officers, directors, employees, and affiliates from any claim, demand, liability, or expense arising out of your breach of these Terms or violation of applicable law.
+            </p>
+
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">9. Governing Law and Jurisdiction</h2>
+            <p className="text-gray-600 mb-6">
+              These Terms are governed by the laws of India. Any disputes shall be subject to the exclusive jurisdiction of the courts in Pune, Maharashtra.
+            </p>
+
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">10. Changes</h2>
+            <p className="text-gray-600 mb-6">
+              We reserve the right to modify these Terms at any time. Continued use after changes constitutes acceptance of the updated Terms.
             </p>
           </div>
         </div>
