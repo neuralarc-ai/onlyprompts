@@ -5,7 +5,6 @@ import { useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Hero from '@/components/Hero';
-import CategoryFilter from '@/components/CategoryFilter';
 import PromptCard from '@/components/PromptCard';
 import AuthModal from '@/components/AuthModal';
 // PromptModal import removed - now using direct navigation to prompt pages
@@ -14,7 +13,6 @@ import { useAuth } from '@/hooks/useAuth';
 
 function HomeContent() {
   const searchParams = useSearchParams();
-  const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [showAuthModal, setShowAuthModal] = useState(false);
   // Modal state removed - now using direct navigation to prompt pages
@@ -37,7 +35,6 @@ function HomeContent() {
     loadMore, 
     refresh 
   } = usePrompts({
-    category: selectedCategory,
     searchQuery: searchQuery || undefined,
     trending: false,
     limit: 12
@@ -59,10 +56,6 @@ function HomeContent() {
       <Hero />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-        <CategoryFilter 
-          selectedCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
-        />
 
         {/* Search Results Header */}
         {searchQuery && (
@@ -140,14 +133,11 @@ function HomeContent() {
             <p className="text-gray-600 mb-6">
               {searchQuery 
                 ? `No prompts match your search for "${searchQuery}". Try different keywords or browse all prompts.`
-                : 'No prompts available in this category. Try selecting a different category.'
+                : 'No prompts available at the moment.'
               }
             </p>
             <button
-              onClick={() => {
-                setSearchQuery('');
-                setSelectedCategory('All');
-              }}
+              onClick={() => setSearchQuery('')}
               className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-all duration-200 font-medium"
             >
               Browse All Prompts
