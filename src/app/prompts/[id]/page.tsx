@@ -8,6 +8,7 @@ import AuthModal from '@/components/AuthModal';
 import { DatabaseService } from '@/lib/database';
 import { useLikes } from '@/hooks/useLikes';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/lib/supabase';
 
 interface Prompt {
   id: string;
@@ -17,7 +18,6 @@ interface Prompt {
   image_url: string;
   author: string;
   likes: number;
-  category: string;
   created_at: string;
   updated_at: string;
   tags: string[];
@@ -39,6 +39,34 @@ export default function PromptDetailPage() {
       fetchPrompt();
     }
   }, [params.id]);
+
+  // Real-time subscription for like count updates
+  useEffect(() => {
+    if (!prompt) return;
+
+    const subscription = supabase
+      .channel('prompt_likes_changes')
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'prompts',
+        filter: `id=eq.${prompt.id}`
+      }, (payload) => {
+        console.log('Real-time prompt update:', payload);
+        
+        if (payload.eventType === 'UPDATE' && payload.new) {
+          setPrompt(prev => prev ? {
+            ...prev,
+            likes: payload.new.likes || prev.likes
+          } : null);
+        }
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [prompt?.id]);
 
   const fetchPrompt = async () => {
     try {
@@ -70,13 +98,22 @@ export default function PromptDetailPage() {
     router.back();
   };
 
-  const handleLikeClick = () => {
+  const handleLikeClick = async () => {
     if (!user) {
       setShowAuthModal(true);
       return;
     }
     if (prompt) {
-      toggleLike(prompt.id);
+      const wasLiked = isLiked(prompt.id);
+      const success = await toggleLike(prompt.id);
+      
+      if (success !== undefined) {
+        // Update the local prompt state with the new like count
+        setPrompt(prev => prev ? {
+          ...prev,
+          likes: wasLiked ? prev.likes - 1 : prev.likes + 1
+        } : null);
+      }
     }
   };
 
@@ -235,16 +272,16 @@ export default function PromptDetailPage() {
               </button>
 
               {/* Like count with box */}
-              <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
+              <div className="bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 border border-gray-200 shadow-sm inline-block">
                 <div className="flex items-center space-x-2 text-gray-600">
                   <button
                     onClick={handleLikeClick}
-                    className={`flex items-center space-x-2 ${
+                    className={`flex items-center space-x-1 ${
                       prompt && isLiked(prompt.id) ? 'text-red-500' : 'text-gray-400 hover:text-red-500'
                     } transition-colors`}
                   >
                     <svg
-                      className={`h-6 w-6 ${prompt && isLiked(prompt.id) ? 'fill-current' : ''}`}
+                      className={`h-4 w-4 ${prompt && isLiked(prompt.id) ? 'fill-current' : ''}`}
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -252,9 +289,28 @@ export default function PromptDetailPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                     </svg>
                   </button>
-                  <span className="font-medium">{prompt?.likes || 0} LIKES</span>
+                  <span className="font-medium text-sm">{prompt?.likes || 0}</span>
                 </div>
               </div>
+
+              {/* Tags section */}
+              {prompt?.tags && prompt.tags.length > 0 && (
+                <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
+                  <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-3">
+                    TAGS
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {prompt.tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="px-3 py-1 bg-gray-200 text-gray-700 text-sm rounded-full font-medium"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
