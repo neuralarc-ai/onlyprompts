@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { DatabaseService } from '@/lib/database';
 import { supabase } from '@/lib/supabase';
 
@@ -16,6 +16,7 @@ export function usePrompts(options: UsePromptsOptions = {}) {
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [offset, setOffset] = useState(0);
+  const scrollPositionRef = useRef<number | null>(null);
 
   const { searchQuery, trending = false, limit = 50 } = options;
 
@@ -57,6 +58,32 @@ export function usePrompts(options: UsePromptsOptions = {}) {
     }
   }, [loading, hasMore, fetchPrompts]);
 
+  const loadAllPrompts = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Store current scroll position in ref
+      scrollPositionRef.current = window.scrollY;
+      
+      let response;
+      if (trending) {
+        response = await DatabaseService.getAllTrendingPrompts();
+      } else if (searchQuery) {
+        response = await DatabaseService.searchAllPrompts(searchQuery);
+      } else {
+        response = await DatabaseService.getAllApprovedPrompts();
+      }
+
+      setPrompts(response);
+      setHasMore(false); // No more prompts to load
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch all prompts');
+    } finally {
+      setLoading(false);
+    }
+  }, [searchQuery, trending]);
+
   const refresh = useCallback(() => {
     setOffset(0);
     fetchPrompts(true);
@@ -67,6 +94,26 @@ export function usePrompts(options: UsePromptsOptions = {}) {
     setOffset(0);
     fetchPrompts(true);
   }, [searchQuery, trending]);
+
+  // Restore scroll position after prompts are loaded
+  useEffect(() => {
+    if (scrollPositionRef.current !== null && !loading) {
+      // Use multiple approaches to ensure scroll position is restored
+      const restoreScroll = () => {
+        if (scrollPositionRef.current !== null) {
+          window.scrollTo(0, scrollPositionRef.current);
+          scrollPositionRef.current = null; // Clear after restoring
+        }
+      };
+      
+      // Try immediately and with delays to ensure it works
+      requestAnimationFrame(() => {
+        restoreScroll();
+        setTimeout(restoreScroll, 50);
+        setTimeout(restoreScroll, 200);
+      });
+    }
+  }, [prompts, loading]);
 
   // Real-time subscriptions
   useEffect(() => {
@@ -106,6 +153,7 @@ export function usePrompts(options: UsePromptsOptions = {}) {
     error,
     hasMore,
     loadMore,
+    loadAllPrompts,
     refresh
   };
 }

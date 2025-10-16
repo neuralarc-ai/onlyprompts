@@ -267,4 +267,57 @@ export class DatabaseService {
     if (error) throw error
     return data
   }
+
+  static async getAllApprovedPrompts() {
+    const { data, error } = await supabase
+      .from('prompts')
+      .select('*')
+      .eq('approval_status', 'approved')
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    
+    // Ensure all prompts have valid image URLs
+    return data.map(prompt => ({
+      ...prompt,
+      image_url: prompt.image_url && prompt.image_url.trim() !== '' 
+        ? prompt.image_url 
+        : DEFAULT_IMAGE_URL
+    }))
+  }
+
+  static async getAllTrendingPrompts() {
+    const { data, error } = await supabase
+      .from('prompts')
+      .select('*')
+      .eq('approval_status', 'approved')
+      .order('likes', { ascending: false })
+
+    if (error) throw error
+    
+    return data.map(prompt => ({
+      ...prompt,
+      image_url: prompt.image_url && prompt.image_url.trim() !== '' 
+        ? prompt.image_url 
+        : DEFAULT_IMAGE_URL
+    }))
+  }
+
+  static async searchAllPrompts(query: string) {
+    const { data, error } = await supabase
+      .from('prompts')
+      .select('*')
+      .eq('approval_status', 'approved')
+      .or(`title.ilike.%${query}%,prompt.ilike.%${query}%,author.ilike.%${query}%`)
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    
+    return data.map(prompt => ({
+      ...prompt,
+      image_url: prompt.image_url && prompt.image_url.trim() !== '' 
+        ? prompt.image_url 
+        : DEFAULT_IMAGE_URL
+    }))
+  }
 }

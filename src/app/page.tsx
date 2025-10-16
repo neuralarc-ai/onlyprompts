@@ -33,6 +33,7 @@ function HomeContent() {
     error, 
     hasMore, 
     loadMore, 
+    loadAllPrompts,
     refresh 
   } = usePrompts({
     searchQuery: searchQuery || undefined,
@@ -144,16 +145,19 @@ function HomeContent() {
           </div>
         )}
 
-        {/* Load More Button */}
+        {/* Load All Prompts Button */}
         {filteredPrompts.length > 0 && hasMore && (
           <div className="text-center mt-12">
             <button 
-              onClick={loadMore}
+              onClick={loadAllPrompts}
               disabled={loading}
               className="bg-white border border-gray-300 text-gray-700 px-8 py-3 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Loading...' : 'Load More Prompts'}
+              {loading ? 'Loading All Prompts...' : 'Load All Prompts & Scroll to Explore'}
             </button>
+            <p className="text-sm text-gray-500 mt-2">
+              Load all available prompts and continue scrolling from where you left off
+            </p>
           </div>
         )}
       </main>

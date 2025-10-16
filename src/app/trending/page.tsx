@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PromptCard from '@/components/PromptCard';
@@ -9,6 +10,7 @@ import { usePrompts } from '@/hooks/usePrompts';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function TrendingPage() {
+  const router = useRouter();
   const { user } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   
@@ -19,6 +21,7 @@ export default function TrendingPage() {
     error, 
     hasMore, 
     loadMore, 
+    loadAllPrompts,
     refresh 
   } = usePrompts({
     trending: true,
@@ -158,7 +161,7 @@ export default function TrendingPage() {
               Be the first to submit a prompt and start trending!
             </p>
             <button
-              onClick={() => window.location.href = '/submit'}
+              onClick={() => router.push('/submit')}
               className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-all duration-200 font-medium"
             >
               Submit a Prompt
@@ -166,16 +169,19 @@ export default function TrendingPage() {
           </div>
         )}
 
-        {/* Load More Button */}
+        {/* Load All Trending Button */}
         {trendingPrompts.length > 0 && hasMore && (
           <div className="text-center mt-12">
             <button 
-              onClick={loadMore}
+              onClick={loadAllPrompts}
               disabled={loading}
               className="bg-black text-white px-8 py-3 rounded-xl hover:bg-gray-800 transition-all duration-200 font-medium shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Loading...' : 'Load More Trending'}
+              {loading ? 'Loading All Trending...' : 'Load All Trending & Scroll to Explore'}
             </button>
+            <p className="text-sm text-gray-500 mt-2">
+              Load all trending prompts and continue scrolling from where you left off
+            </p>
           </div>
         )}
       </main>

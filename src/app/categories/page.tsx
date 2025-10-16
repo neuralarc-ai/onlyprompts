@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PromptCard from '@/components/PromptCard';
@@ -30,6 +31,7 @@ const tagCategories = {
 };
 
 export default function CategoriesPage() {
+  const router = useRouter();
   const { user } = useAuth();
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -41,6 +43,7 @@ export default function CategoriesPage() {
     error, 
     hasMore, 
     loadMore, 
+    loadAllPrompts,
     refresh 
   } = usePrompts({
     limit: 12
@@ -273,7 +276,7 @@ export default function CategoriesPage() {
                 }
               </p>
               <button
-                onClick={() => window.location.href = '/submit'}
+                onClick={() => router.push('/submit')}
                 className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-all duration-200 font-medium"
               >
                 Submit a Prompt
@@ -281,16 +284,19 @@ export default function CategoriesPage() {
             </div>
           )}
 
-          {/* Load More Button */}
+          {/* Load All Prompts Button */}
           {filteredPrompts.length > 0 && hasMore && (
             <div className="text-center mt-12">
               <button 
-                onClick={loadMore}
+                onClick={loadAllPrompts}
                 disabled={loading}
                 className="bg-black text-white px-8 py-3 rounded-xl hover:bg-gray-800 transition-all duration-200 font-medium shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Loading...' : 'Load More Prompts'}
+                {loading ? 'Loading All Prompts...' : 'Load All Prompts & Scroll to Explore'}
               </button>
+              <p className="text-sm text-gray-500 mt-2">
+                Load all available prompts and continue scrolling from where you left off
+              </p>
             </div>
           )}
         </div>
