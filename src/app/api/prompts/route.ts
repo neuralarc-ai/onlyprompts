@@ -85,6 +85,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Check if the user is a superadmin
+    const isSuperAdmin = await DatabaseService.isSuperAdmin(authedUser.id)
+    
+    // Determine approval status based on user role
+    const approvalStatus = isSuperAdmin ? 'approved' : 'pending'
+    const reviewedBy = isSuperAdmin ? authedUser.id : null
+    const reviewedAt = isSuperAdmin ? new Date().toISOString() : null
+
     const { data, error } = await supabaseAdmin
       .from('prompts')
       .insert([
@@ -102,6 +110,9 @@ export async function POST(request: NextRequest) {
                 .filter((tag: string) => tag.length > 0)
             : [],
           user_id: authedUser.id,
+          approval_status: approvalStatus,
+          reviewed_by: reviewedBy,
+          reviewed_at: reviewedAt,
         },
       ])
       .select()
@@ -112,27 +123,31 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to create prompt' }, { status: 500 })
     }
 
-    // Send email notification to super admins
-    try {
-      const superAdminEmails = await DatabaseService.getSuperAdminEmails()
-      
-      if (superAdminEmails.length > 0) {
-        await EmailService.sendPromptApprovalNotification(
-          {
-            id: data.id,
-            title: data.title,
-            author: data.author,
-            prompt: data.prompt
-          },
-          superAdminEmails
-        )
-        console.log('📧 Email notification sent to super admins')
-      } else {
-        console.log('⚠️ No super admin emails found for notification')
+    // Send email notification to super admins only for non-superadmin prompts
+    if (!isSuperAdmin) {
+      try {
+        const superAdminEmails = await DatabaseService.getSuperAdminEmails()
+        
+        if (superAdminEmails.length > 0) {
+          await EmailService.sendPromptApprovalNotification(
+            {
+              id: data.id,
+              title: data.title,
+              author: data.author,
+              prompt: data.prompt
+            },
+            superAdminEmails
+          )
+          console.log('📧 Email notification sent to super admins')
+        } else {
+          console.log('⚠️ No super admin emails found for notification')
+        }
+      } catch (emailError) {
+        // Don't fail the prompt creation if email fails
+        console.error('Failed to send email notification:', emailError)
       }
-    } catch (emailError) {
-      // Don't fail the prompt creation if email fails
-      console.error('Failed to send email notification:', emailError)
+    } else {
+      console.log('✅ SuperAdmin prompt auto-approved - no notification needed')
     }
 
     return NextResponse.json(data, { status: 201 })

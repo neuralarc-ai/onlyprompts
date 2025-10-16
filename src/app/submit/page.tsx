@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import { useSuperAdmin } from '@/hooks/useSuperAdmin';
 import { supabase } from '@/lib/supabase';
 import AuthModal from '@/components/AuthModal';
 import Header from '@/components/Header';
@@ -20,6 +21,7 @@ interface FormData {
 
 export default function SubmitPage() {
   const { user } = useAuth();
+  const { isSuperAdmin } = useSuperAdmin();
   const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
     title: '',
@@ -185,6 +187,18 @@ export default function SubmitPage() {
           <div className="bg-black px-8 py-6">
             <h2 className="text-2xl font-bold text-white">Share Your Prompt</h2>
             <p className="text-gray-300 mt-2">Fill out the form below to submit your AI prompt</p>
+            {isSuperAdmin && (
+              <div className="mt-3 p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                <div className="flex items-center">
+                  <svg className="h-5 w-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p className="text-green-300 text-sm font-medium">
+                    SuperAdmin: Your prompts will be automatically approved and published immediately
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           <form onSubmit={handleSubmit} className="p-8 space-y-6">
@@ -362,10 +376,15 @@ export default function SubmitPage() {
                   <svg className="h-5 w-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <p className="text-green-800 font-medium">Prompt submitted successfully!</p>
+                  <p className="text-green-800 font-medium">
+                    {isSuperAdmin ? 'Prompt submitted and auto-approved!' : 'Prompt submitted successfully!'}
+                  </p>
                 </div>
                 <p className="text-green-700 text-sm mt-1">
-                  Your prompt has been saved to your profile and is now live! Redirecting to your prompts page...
+                  {isSuperAdmin 
+                    ? 'Your prompt has been automatically approved and is now live! Redirecting to your prompts page...'
+                    : 'Your prompt has been saved and is pending approval. Redirecting to your prompts page...'
+                  }
                 </p>
               </div>
             </div>
