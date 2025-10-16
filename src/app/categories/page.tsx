@@ -52,7 +52,7 @@ export default function CategoriesPage() {
     
     // Debug logging
     if (selectedTags.length > 0) {
-      console.log('Filtering prompt:', prompt.title, 'Tags:', prompt.tags, 'Category:', prompt.category);
+      console.log('Filtering prompt:', prompt.title, 'Tags:', prompt.tags);
     }
     
     // Check if ALL selected tags match the prompt
@@ -66,9 +66,6 @@ export default function CategoriesPage() {
         lowerTag.includes(promptTag.toLowerCase())
       );
       
-      // Check if tag matches category (exact match or contains)
-      const categoryMatch = prompt.category?.toLowerCase() === lowerTag ||
-        prompt.category?.toLowerCase().includes(lowerTag);
       
       // Check if tag matches title (contains)
       const titleMatch = prompt.title?.toLowerCase().includes(lowerTag);
@@ -76,7 +73,7 @@ export default function CategoriesPage() {
       // Check if tag matches prompt content (contains)
       const promptMatch = prompt.prompt?.toLowerCase().includes(lowerTag);
       
-      const matches = tagMatch || categoryMatch || titleMatch || promptMatch;
+      const matches = tagMatch || titleMatch || promptMatch;
       
       if (matches) {
         console.log(`Tag "${tag}" matched prompt "${prompt.title}"`);
@@ -254,7 +251,6 @@ export default function CategoriesPage() {
                     image_url={prompt.image_url}
                     author={prompt.author}
                     likes={prompt.likes}
-                    category={prompt.category}
                     created_at={prompt.created_at}
                     userId={user?.id}
                   />

@@ -16,8 +16,6 @@ export async function GET(request: NextRequest) {
 
     if (trending === 'true') {
       prompts = await DatabaseService.getTrendingPrompts(limit, offset)
-    } else if (category && category !== 'All') {
-      prompts = await DatabaseService.getPromptsByCategory(category, limit, offset)
     } else if (search) {
       prompts = await DatabaseService.searchPrompts(search, limit, offset)
     } else {
@@ -80,7 +78,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Validate required fields
-    if (!body.title || !body.prompt || !body.category) {
+    if (!body.title || !body.prompt) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -95,7 +93,6 @@ export async function POST(request: NextRequest) {
           prompt: body.prompt,
           image_url: body.imageUrl || body.image_url,
           author: body.author,
-          category: body.category,
           tags: Array.isArray(body.tags)
             ? body.tags
             : body.tags
@@ -125,7 +122,6 @@ export async function POST(request: NextRequest) {
             id: data.id,
             title: data.title,
             author: data.author,
-            category: data.category,
             prompt: data.prompt
           },
           superAdminEmails

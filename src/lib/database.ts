@@ -4,24 +4,8 @@ import type { Database } from './supabase'
 type PromptInsert = Database['public']['Tables']['prompts']['Insert']
 type PromptUpdate = Database['public']['Tables']['prompts']['Update']
 
-// Helper function to get a default image URL if none provided
-const getDefaultImageUrl = (category: string): string => {
-  const defaultImages = {
-    'Art & Design': 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=500&h=300&fit=crop',
-    'Writing': 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=500&h=300&fit=crop',
-    'Marketing': 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=500&h=300&fit=crop',
-    'Code': 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=500&h=300&fit=crop',
-    'Photography': 'https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?w=500&h=300&fit=crop',
-    'Music': 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=500&h=300&fit=crop',
-    'Business': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=300&fit=crop',
-    'Education': 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=500&h=300&fit=crop',
-    'Gaming': 'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=500&h=300&fit=crop',
-    'Social Media': 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=500&h=300&fit=crop',
-    'Productivity': 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=500&h=300&fit=crop'
-  };
-  
-  return defaultImages[category as keyof typeof defaultImages] || 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=500&h=300&fit=crop';
-};
+// Default image URL for prompts without images
+const DEFAULT_IMAGE_URL = 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=500&h=300&fit=crop';
 
 export class DatabaseService {
   // Prompts
@@ -40,7 +24,7 @@ export class DatabaseService {
       ...prompt,
       image_url: prompt.image_url && prompt.image_url.trim() !== '' 
         ? prompt.image_url 
-        : getDefaultImageUrl(prompt.category)
+        : DEFAULT_IMAGE_URL
     }))
   }
 
@@ -58,28 +42,10 @@ export class DatabaseService {
       ...data,
       image_url: data.image_url && data.image_url.trim() !== '' 
         ? data.image_url 
-        : getDefaultImageUrl(data.category)
+        : DEFAULT_IMAGE_URL
     }
   }
 
-  static async getPromptsByCategory(category: string, limit: number = 50, offset: number = 0) {
-    const { data, error } = await supabase
-      .from('prompts')
-      .select('*')
-      .eq('category', category)
-      .eq('approval_status', 'approved')
-      .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1)
-
-    if (error) throw error
-    
-    return data.map(prompt => ({
-      ...prompt,
-      image_url: prompt.image_url && prompt.image_url.trim() !== '' 
-        ? prompt.image_url 
-        : getDefaultImageUrl(prompt.category)
-    }))
-  }
 
   static async getTrendingPrompts(limit: number = 50, offset: number = 0) {
     const { data, error } = await supabase
@@ -95,7 +61,7 @@ export class DatabaseService {
       ...prompt,
       image_url: prompt.image_url && prompt.image_url.trim() !== '' 
         ? prompt.image_url 
-        : getDefaultImageUrl(prompt.category)
+        : DEFAULT_IMAGE_URL
     }))
   }
 
@@ -104,7 +70,7 @@ export class DatabaseService {
       .from('prompts')
       .select('*')
       .eq('approval_status', 'approved')
-      .or(`title.ilike.%${query}%,prompt.ilike.%${query}%,author.ilike.%${query}%,category.ilike.%${query}%`)
+      .or(`title.ilike.%${query}%,prompt.ilike.%${query}%,author.ilike.%${query}%`)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1)
 
@@ -114,7 +80,7 @@ export class DatabaseService {
       ...prompt,
       image_url: prompt.image_url && prompt.image_url.trim() !== '' 
         ? prompt.image_url 
-        : getDefaultImageUrl(prompt.category)
+        : DEFAULT_IMAGE_URL
     }))
   }
 
@@ -220,27 +186,6 @@ export class DatabaseService {
       .subscribe()
   }
 
-  // Categories
-  static async getCategories() {
-    const { data, error } = await supabase
-      .from('prompts')
-      .select('category')
-      .eq('approval_status', 'approved')
-      .not('category', 'is', null)
-
-    if (error) throw error
-    
-    // Get unique categories with counts
-    const categoryCounts = data.reduce((acc: Record<string, number>, item) => {
-      acc[item.category] = (acc[item.category] || 0) + 1
-      return acc
-    }, {})
-
-    return Object.entries(categoryCounts).map(([name, count]) => ({
-      name,
-      count: count as number
-    }))
-  }
 
   // SuperAdmin functions
   static async isSuperAdmin(userId: string) {

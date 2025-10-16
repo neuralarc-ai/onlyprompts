@@ -5,20 +5,19 @@ import { DatabaseService } from '@/lib/database';
 import { supabase } from '@/lib/supabase';
 
 interface UsePromptsOptions {
-  category?: string;
   searchQuery?: string;
   trending?: boolean;
   limit?: number;
 }
 
 export function usePrompts(options: UsePromptsOptions = {}) {
-  const [prompts, setPrompts] = useState<{ id: string; title: string; description: string; prompt: string; likes: number; created_at: string; updated_at: string; category: string; tags: string[]; image_url: string; author: string }[]>([]);
+  const [prompts, setPrompts] = useState<{ id: string; title: string; description: string; prompt: string; likes: number; created_at: string; updated_at: string; tags: string[]; image_url: string; author: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [offset, setOffset] = useState(0);
 
-  const { category, searchQuery, trending = false, limit = 50 } = options;
+  const { searchQuery, trending = false, limit = 50 } = options;
 
   const fetchPrompts = useCallback(async (reset = false) => {
     try {
@@ -30,8 +29,6 @@ export function usePrompts(options: UsePromptsOptions = {}) {
       let response;
       if (trending) {
         response = await DatabaseService.getTrendingPrompts(limit, currentOffset);
-      } else if (category && category !== 'All') {
-        response = await DatabaseService.getPromptsByCategory(category, limit, currentOffset);
       } else if (searchQuery) {
         response = await DatabaseService.searchPrompts(searchQuery, limit, currentOffset);
       } else {
@@ -52,7 +49,7 @@ export function usePrompts(options: UsePromptsOptions = {}) {
     } finally {
       setLoading(false);
     }
-  }, [category, searchQuery, trending, limit, offset]);
+  }, [searchQuery, trending, limit, offset]);
 
   const loadMore = useCallback(() => {
     if (!loading && hasMore) {
@@ -69,7 +66,7 @@ export function usePrompts(options: UsePromptsOptions = {}) {
   useEffect(() => {
     setOffset(0);
     fetchPrompts(true);
-  }, [category, searchQuery, trending]);
+  }, [searchQuery, trending]);
 
   // Real-time subscriptions
   useEffect(() => {

@@ -61,7 +61,6 @@ export class EmailService {
       id: string;
       title: string;
       author: string;
-      category: string;
       prompt: string;
     },
     superAdminEmails: string[]
@@ -78,7 +77,6 @@ export class EmailService {
           <h3 style="color: #000; margin-top: 0;">Prompt Details</h3>
           <p><strong>Title:</strong> ${promptData.title}</p>
           <p><strong>Author:</strong> ${promptData.author}</p>
-          <p><strong>Category:</strong> ${promptData.category}</p>
           <p><strong>Prompt ID:</strong> ${promptData.id}</p>
         </div>
         
@@ -105,7 +103,6 @@ New Prompt Submitted for Approval
 
 Title: ${promptData.title}
 Author: ${promptData.author}
-Category: ${promptData.category}
 Prompt ID: ${promptData.id}
 
 Prompt Text:

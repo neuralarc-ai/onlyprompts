@@ -134,7 +134,6 @@ export default function TrendingPage() {
                   image_url={prompt.image_url}
                   author={prompt.author}
                   likes={prompt.likes}
-                  category={prompt.category}
                   created_at={prompt.created_at}
                   userId={user?.id}
                   onLikeClick={handleLikeClick}

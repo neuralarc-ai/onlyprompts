@@ -10,7 +10,6 @@ interface Prompt {
   title: string;
   prompt: string;
   author: string;
-  category: string;
   tags: string[];
   image_url: string;
   likes: number;
@@ -277,7 +276,6 @@ export default function SuperAdminDashboard() {
                     <p className="text-gray-600 mb-2">{prompt.prompt}</p>
                     <div className="flex items-center space-x-4 text-sm text-gray-500">
                       <span>By: {prompt.author}</span>
-                      <span>Category: {prompt.category}</span>
                       <span>Created: {new Date(prompt.created_at).toLocaleDateString()}</span>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(prompt.approval_status)}`}>
                         {prompt.approval_status}

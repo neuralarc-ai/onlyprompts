@@ -14,7 +14,7 @@ export default function MyPromptsPage() {
     avgLength: 0,
     lastUpdate: null as string | null,
   });
-  const [userPrompts, setUserPrompts] = useState<{ id: string; title: string; description: string; prompt: string; likes: number; created_at: string; updated_at: string; category: string; tags: string[]; image_url: string; author: string; approval_status: 'pending' | 'approved' | 'rejected'; rejection_reason: string | null }[]>([]);
+  const [userPrompts, setUserPrompts] = useState<{ id: string; title: string; description: string; prompt: string; likes: number; created_at: string; updated_at: string; tags: string[]; image_url: string; author: string; approval_status: 'pending' | 'approved' | 'rejected'; rejection_reason: string | null }[]>([]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -239,8 +239,6 @@ export default function MyPromptsPage() {
                             {prompt.likes} likes
                           </span>
                           <span>{new Date(prompt.created_at).toLocaleDateString()}</span>
-                          <span className="text-xs text-gray-400">•</span>
-                          <span className="text-xs">{prompt.category}</span>
                         </div>
                       </div>
                     ))}

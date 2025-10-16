@@ -10,7 +10,6 @@ interface Prompt {
   image_url: string;
   author: string;
   likes: number;
-  category: string;
   created_at: string;
 }
 
@@ -77,9 +76,6 @@ export default function PromptModal({ isOpen, onClose, prompt }: PromptModalProp
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-2xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <span className="bg-black text-white text-xs font-medium px-3 py-1 rounded-full">
-                {prompt.category}
-              </span>
               <span className="text-sm text-gray-500">
                 by {prompt.author}
               </span>

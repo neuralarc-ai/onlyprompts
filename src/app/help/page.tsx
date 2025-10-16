@@ -16,7 +16,7 @@ const faqData: FAQItem[] = [
   },
   {
     question: "How do I submit a prompt?",
-    answer: "Click on the 'Submit' button in the navigation menu, fill out the form with your prompt details, including title, description, full prompt text, category, and an example image. Once submitted, our team will review it before publishing."
+    answer: "Click on the 'Submit' button in the navigation menu, fill out the form with your prompt details, including title, description, full prompt text, and an example image. Once submitted, our team will review it before publishing."
   },
   {
     question: "What makes a good AI prompt?",
@@ -32,7 +32,7 @@ const faqData: FAQItem[] = [
   },
   {
     question: "How are prompts categorized?",
-    answer: "Prompts are organized into categories like Art & Design, Writing, Marketing, Code, Photography, and more. You can browse by category or use the search function to find specific types of prompts."
+    answer: "Prompts are organized using tags and search functionality. You can browse by tags or use the search function to find specific types of prompts that match your needs."
   },
   {
     question: "What AI tools work with these prompts?",
@@ -175,7 +175,7 @@ export default function HelpPage() {
               <h3 className="text-xl font-semibold text-gray-900 mb-3">Getting Started</h3>
               <ul className="space-y-2 text-gray-600">
                 <li>• How to browse prompts</li>
-                <li>• Understanding prompt categories</li>
+                <li>• Understanding prompt tags</li>
                 <li>• Using the search function</li>
                 <li>• Copying prompts to clipboard</li>
               </ul>
@@ -185,7 +185,7 @@ export default function HelpPage() {
               <h3 className="text-xl font-semibold text-gray-900 mb-3">Submitting Prompts</h3>
               <ul className="space-y-2 text-gray-600">
                 <li>• Writing effective prompts</li>
-                <li>• Choosing the right category</li>
+                <li>• Adding relevant tags</li>
                 <li>• Adding example images</li>
                 <li>• Review process</li>
               </ul>

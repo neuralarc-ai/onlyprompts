@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
@@ -11,7 +11,6 @@ import Footer from '@/components/Footer';
 interface FormData {
   title: string;
   prompt: string;
-  category: string;
   imageUrl: string;
   author: string;
   tags: string;
@@ -25,7 +24,6 @@ export default function SubmitPage() {
   const [formData, setFormData] = useState<FormData>({
     title: '',
     prompt: '',
-    category: '',
     imageUrl: '',
     author: user?.user_metadata?.username || user?.email?.split('@')[0] || '',
     tags: '',
@@ -37,19 +35,16 @@ export default function SubmitPage() {
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [authModalOpen, setAuthModalOpen] = useState(false);
 
-  const categories = [
-    'Art & Design',
-    'Writing',
-    'Marketing',
-    'Code',
-    'Photography',
-    'Music',
-    'Business',
-    'Education',
-    'Gaming',
-    'Social Media',
-    'Productivity'
-  ];
+  // Update author name when user changes
+  useEffect(() => {
+    if (user) {
+      const userName = user.user_metadata?.username || user.email?.split('@')[0] || '';
+      setFormData(prev => ({
+        ...prev,
+        author: userName
+      }));
+    }
+  }, [user]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -135,7 +130,6 @@ export default function SubmitPage() {
         body: JSON.stringify({
           title: formData.title,
           prompt: formData.prompt,
-          category: formData.category,
           imageUrl: finalImageUrl,
           author: formData.author,
           tags: formData.tags,
@@ -229,25 +223,6 @@ export default function SubmitPage() {
               />
             </div>
 
-            {/* Category */}
-            <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-                Category *
-              </label>
-              <select
-                id="category"
-                name="category"
-                value={formData.category}
-                onChange={handleInputChange}
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              >
-                <option value="">Select a category</option>
-                {categories.map(category => (
-                  <option key={category} value={category}>{category}</option>
-                ))}
-              </select>
-            </div>
 
             {/* Image Source Selection */}
             <div>
@@ -437,10 +412,6 @@ export default function SubmitPage() {
             <div className="flex items-start">
               <div className="w-2 h-2 bg-indigo-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
               <p>Provide an image that accurately represents your prompt&apos;s output</p>
-            </div>
-            <div className="flex items-start">
-              <div className="w-2 h-2 bg-indigo-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-              <p>Choose the most appropriate category for your prompt</p>
             </div>
             <div className="flex items-start">
               <div className="w-2 h-2 bg-indigo-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>

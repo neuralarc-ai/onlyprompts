@@ -14,7 +14,6 @@ interface PromptCardProps {
   imageUrl?: string;  // camelCase (from sample data)
   author: string;
   likes: number;
-  category: string;
   created_at?: string; // snake_case (from DB)
   createdAt?: string;  // camelCase (from sample data)
   userId?: string;
@@ -30,7 +29,6 @@ export default function PromptCard({
   imageUrl,
   author,
   likes,
-  category,
   created_at,
   createdAt,
   userId,
