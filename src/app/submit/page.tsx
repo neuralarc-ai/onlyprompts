@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useSuperAdmin } from '@/hooks/useSuperAdmin';
 import { supabase } from '@/lib/supabase';
@@ -19,10 +19,11 @@ interface FormData {
   imageSource: 'url' | 'upload';
 }
 
-export default function SubmitPage() {
+function SubmitPageContent() {
   const { user } = useAuth();
   const { isSuperAdmin } = useSuperAdmin();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [formData, setFormData] = useState<FormData>({
     title: '',
     prompt: '',
@@ -36,6 +37,8 @@ export default function SubmitPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [isPreFilled, setIsPreFilled] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   // Update author name when user changes
   useEffect(() => {
@@ -47,6 +50,75 @@ export default function SubmitPage() {
       }));
     }
   }, [user]);
+
+  // Handle sessionStorage data for pre-filling form
+  useEffect(() => {
+    const storedData = sessionStorage.getItem('submitFormData');
+    
+    console.log('Checking sessionStorage for submitFormData:', storedData ? 'found' : 'not found');
+    
+    if (storedData) {
+      try {
+        const parsedData = JSON.parse(storedData);
+        console.log('SessionStorage data received:', parsedData);
+        console.log('Image URL from sessionStorage:', parsedData.imageUrl);
+
+        // Check if data is recent (within last 10 minutes)
+        const isRecent = Date.now() - parsedData.timestamp < 10 * 60 * 1000;
+        console.log('Data is recent:', isRecent, 'Age:', Date.now() - parsedData.timestamp);
+        
+        if (isRecent && (parsedData.prompt || parsedData.imageUrl || parsedData.title || parsedData.tags)) {
+          console.log('Pre-filling form with sessionStorage data');
+          setIsPreFilled(true);
+          setFormData(prev => {
+            const newData = {
+              ...prev,
+              ...(parsedData.prompt && { prompt: parsedData.prompt }),
+              ...(parsedData.imageUrl && { imageUrl: parsedData.imageUrl }),
+              ...(parsedData.title && { title: parsedData.title }),
+              ...(parsedData.tags && { tags: parsedData.tags }),
+              imageSource: parsedData.imageUrl ? 'url' as const : prev.imageSource
+            };
+            console.log('Updated form data:', newData);
+            console.log('Final imageUrl in form:', newData.imageUrl);
+            return newData;
+          });
+          
+          // Clear the stored data after using it
+          sessionStorage.removeItem('submitFormData');
+        } else {
+          console.log('SessionStorage data is too old or invalid, ignoring');
+          sessionStorage.removeItem('submitFormData');
+        }
+      } catch (error) {
+        console.error('Error parsing sessionStorage data:', error);
+        sessionStorage.removeItem('submitFormData');
+      }
+    }
+
+    // Also check URL parameters as fallback
+    const prompt = searchParams.get('prompt');
+    const imageUrl = searchParams.get('imageUrl');
+    const title = searchParams.get('title');
+    const tags = searchParams.get('tags');
+
+    if (prompt || imageUrl || title || tags) {
+      console.log('URL parameters received as fallback:', { prompt, imageUrl, title, tags });
+      setIsPreFilled(true);
+      setFormData(prev => {
+        const newData = {
+          ...prev,
+          ...(prompt && { prompt: decodeURIComponent(prompt) }),
+          ...(imageUrl && { imageUrl: decodeURIComponent(imageUrl) }),
+          ...(title && { title: decodeURIComponent(title) }),
+          ...(tags && { tags: decodeURIComponent(tags) }),
+          imageSource: imageUrl ? 'url' as const : prev.imageSource
+        };
+        console.log('Updated form data from URL:', newData);
+        return newData;
+      });
+    }
+  }, [searchParams]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -62,6 +134,46 @@ export default function SubmitPage() {
       ...prev,
       imageFile: file
     }));
+  };
+
+  const handleFileUpload = (files: FileList | null) => {
+    if (!files) return;
+    
+    const file = files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert(`${file.name} is not an image.`);
+        return;
+      }
+      
+      // Validate file size (10MB limit)
+      if (file.size > 10 * 1024 * 1024) {
+        alert(`${file.name} is too large. Maximum size is 10MB.`);
+        return;
+      }
+      
+      setFormData(prev => ({
+        ...prev,
+        imageFile: file
+      }));
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    handleFileUpload(e.dataTransfer.files);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
   };
 
   const handleImageSourceChange = (source: 'url' | 'upload') => {
@@ -187,6 +299,18 @@ export default function SubmitPage() {
           <div className="bg-black px-8 py-6">
             <h2 className="text-2xl font-bold text-white">Share Your Prompt</h2>
             <p className="text-gray-300 mt-2">Fill out the form below to submit your AI prompt</p>
+            {isPreFilled && (
+              <div className="mt-3 p-3 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+                <div className="flex items-center">
+                  <svg className="h-5 w-5 text-blue-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p className="text-blue-300 text-sm font-medium">
+                    Form pre-filled with generated content from Image Studio
+                  </p>
+                </div>
+              </div>
+            )}
             {isSuperAdmin && (
               <div className="mt-3 p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
                 <div className="flex items-center">
@@ -290,6 +414,32 @@ export default function SubmitPage() {
               {/* Image Upload Input */}
               {formData.imageSource === 'upload' && (
                 <div>
+                  {/* Drag and Drop Area */}
+                  <div
+                    onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onClick={() => document.getElementById('imageFile')?.click()}
+                    className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+                      isDragOver
+                        ? 'border-indigo-500 bg-indigo-50'
+                        : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                  >
+                    <div className="flex flex-col items-center">
+                      <svg className="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                      </svg>
+                      <p className="text-gray-600 mb-2">
+                        {isDragOver ? 'Drop your image here' : 'Drag & drop an image here, or click to select'}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        JPG, PNG, GIF, WebP (max 10MB)
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Hidden file input */}
                   <input
                     type="file"
                     id="imageFile"
@@ -297,16 +447,25 @@ export default function SubmitPage() {
                     accept="image/*"
                     onChange={handleFileChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                    className="hidden"
                   />
-                  <p className="text-sm text-gray-500 mt-1">
-                    Upload an image that represents your prompt (JPG, PNG, GIF, WebP)
-                  </p>
+
+                  {/* Selected file info */}
                   {formData.imageFile && (
-                    <div className="mt-2">
-                      <p className="text-sm text-green-600">
-                        Selected: {formData.imageFile.name}
-                      </p>
+                    <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                      <div className="flex items-center">
+                        <svg className="h-5 w-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        <div>
+                          <p className="text-sm text-green-800 font-medium">
+                            Selected: {formData.imageFile.name}
+                          </p>
+                          <p className="text-xs text-green-600">
+                            {(formData.imageFile.size / 1024 / 1024).toFixed(2)} MB
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -442,5 +601,20 @@ export default function SubmitPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function SubmitPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading submit form...</p>
+        </div>
+      </div>
+    }>
+      <SubmitPageContent />
+    </Suspense>
   );
 }

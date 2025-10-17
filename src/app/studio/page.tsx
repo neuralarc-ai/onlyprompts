@@ -8,30 +8,12 @@ import Footer from '@/components/Footer';
 export default function ImageStudioPage() {
   const router = useRouter();
   const [prompt, setPrompt] = useState('');
-  const [inputImage, setInputImage] = useState<File | null>(null);
   const [referenceImages, setReferenceImages] = useState<File[]>([]);
-  const [aspectRatio, setAspectRatio] = useState('1:1');
-  const [generatedImage, setGeneratedImage] = useState<{imageUrl: string, prompt: string, hasInputImage: boolean} | null>(null);
+  const [generatedImage, setGeneratedImage] = useState<{imageUrl: string, prompt: string} | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const inputImageRef = useRef<HTMLInputElement>(null);
 
-  const handleInputImageUpload = (files: FileList | null) => {
-    if (!files || files.length === 0) return;
-    
-    const file = files[0];
-    if (file.size > 10 * 1024 * 1024) { // 10MB limit
-      alert(`File ${file.name} is too large. Maximum size is 10MB.`);
-      return;
-    }
-    if (!file.type.startsWith('image/')) {
-      alert(`File ${file.name} is not an image.`);
-      return;
-    }
-    
-    setInputImage(file);
-  };
 
   const handleFileUpload = (files: FileList | null) => {
     if (!files) return;
@@ -61,9 +43,6 @@ export default function ImageStudioPage() {
     e.preventDefault();
   };
 
-  const removeInputImage = () => {
-    setInputImage(null);
-  };
 
   const removeImage = (index: number) => {
     setReferenceImages(prev => prev.filter((_, i) => i !== index));
@@ -81,11 +60,6 @@ export default function ImageStudioPage() {
     try {
       const formData = new FormData();
       formData.append('prompt', prompt);
-      formData.append('aspectRatio', aspectRatio);
-      
-      if (inputImage) {
-        formData.append('inputImage', inputImage);
-      }
       
       referenceImages.forEach((file, index) => {
         formData.append(`referenceImage${index}`, file);
@@ -104,13 +78,118 @@ export default function ImageStudioPage() {
       const data = await response.json();
       setGeneratedImage({
         imageUrl: data.imageUrl,
-        prompt: data.prompt,
-        hasInputImage: data.hasInputImage
+        prompt: data.prompt
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate image');
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleSubmitToGallery = async () => {
+    if (!generatedImage) return;
+
+    console.log('Starting submit to gallery process...');
+    console.log('Generated image data:', generatedImage);
+
+    try {
+      // First, upload the generated image to permanent storage
+      console.log('Uploading generated image to permanent storage...');
+      const uploadResponse = await fetch('/api/upload-generated-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          imageUrl: generatedImage.imageUrl,
+          prompt: generatedImage.prompt
+        }),
+      });
+
+      let permanentImageUrl = generatedImage.imageUrl; // fallback to original
+
+      if (uploadResponse.ok) {
+        const uploadData = await uploadResponse.json();
+        permanentImageUrl = uploadData.url;
+        console.log('Image uploaded successfully:', permanentImageUrl);
+      } else {
+        console.error('Image upload failed, using original URL');
+      }
+
+      // Generate title and tags using Gemini API
+      console.log('Calling generate-prompt API...');
+      const response = await fetch('/api/generate-prompt', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: generatedImage.prompt,
+          type: 'title_and_tags'
+        }),
+      });
+
+      console.log('API response status:', response.status);
+
+      let title = 'Generated Prompt';
+      let tags = 'ai, generated, prompt';
+
+      if (response.ok) {
+        try {
+          const data = await response.json();
+          console.log('Generated data:', data);
+          title = data.title || 'Generated Prompt';
+          tags = data.tags || 'ai, generated, prompt';
+        } catch (parseError) {
+          console.error('Error parsing API response:', parseError);
+        }
+      } else {
+        console.error('API call failed, using fallback values');
+      }
+
+      // Store data in sessionStorage with permanent image URL
+      const submitData = {
+        prompt: generatedImage.prompt,
+        imageUrl: permanentImageUrl,
+        title: title,
+        tags: tags,
+        timestamp: Date.now()
+      };
+
+      console.log('About to store in sessionStorage:', submitData);
+      console.log('Permanent Image URL being stored:', permanentImageUrl);
+      sessionStorage.setItem('submitFormData', JSON.stringify(submitData));
+      console.log('Stored submit data in sessionStorage:', submitData);
+      
+      // Verify it was stored correctly
+      const stored = sessionStorage.getItem('submitFormData');
+      console.log('Verification - stored data:', stored ? JSON.parse(stored) : 'null');
+
+      // Navigate to submit page
+      console.log('Navigating to /submit');
+      router.push('/submit');
+    } catch (err) {
+      console.error('Error in submit process:', err);
+      // Fallback: store basic data and navigate
+      const submitData = {
+        prompt: generatedImage.prompt,
+        imageUrl: generatedImage.imageUrl,
+        title: 'Generated Prompt',
+        tags: 'ai, generated, prompt',
+        timestamp: Date.now()
+      };
+
+      console.log('Fallback - About to store in sessionStorage:', submitData);
+      console.log('Fallback - Image URL being stored:', generatedImage.imageUrl);
+      sessionStorage.setItem('submitFormData', JSON.stringify(submitData));
+      console.log('Fallback: stored basic data in sessionStorage');
+      
+      // Verify it was stored correctly
+      const stored = sessionStorage.getItem('submitFormData');
+      console.log('Fallback - Verification - stored data:', stored ? JSON.parse(stored) : 'null');
+      
+      router.push('/submit');
     }
   };
 
@@ -128,7 +207,7 @@ export default function ImageStudioPage() {
             Generate polished AI visuals in seconds.
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Keep the focus on prompt crafting and reviewing results—everything else stays out of the way.
+            Keep the focus on prompt crafting and reviewing results—everything else stays out of way.
           </p>
         </div>
 
@@ -142,41 +221,15 @@ export default function ImageStudioPage() {
               <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                placeholder={inputImage ? "Describe how you want to edit the uploaded image..." : "Describe the scene, lens, lighting, and styling you want to see."}
+                placeholder="Describe the scene, lens, lighting, and styling you want to see."
                 className="w-full h-32 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent resize-none"
               />
             </div>
 
-            {/* Aspect Ratio Selection */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Aspect Ratio</h3>
-              <div className="grid grid-cols-3 gap-2">
-                {[
-                  { value: '1:1', label: 'Square' },
-                  { value: '16:9', label: 'Wide' },
-                  { value: '4:3', label: 'Standard' },
-                  { value: '3:2', label: 'Photo' },
-                  { value: '9:16', label: 'Portrait' },
-                  { value: '21:9', label: 'Ultra Wide' }
-                ].map((ratio) => (
-                  <button
-                    key={ratio.value}
-                    onClick={() => setAspectRatio(ratio.value)}
-                    className={`p-3 text-sm font-medium rounded-lg border transition-colors ${
-                      aspectRatio === ratio.value
-                        ? 'bg-black text-white border-black'
-                        : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
-                    }`}
-                  >
-                    {ratio.label}
-                  </button>
-                ))}
-              </div>
-            </div>
 
             {/* Reference Images Section */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Reference images</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Your image</h3>
               <p className="text-sm text-gray-600 mb-4">Optional - max 5 - 10MB each</p>
               
               {/* Upload Area */}
@@ -225,47 +278,6 @@ export default function ImageStudioPage() {
               )}
             </div>
 
-            {/* Input Image Section */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Input Image (Optional)</h3>
-              <p className="text-sm text-gray-600 mb-4">Upload an image to edit with your prompt</p>
-              
-              {inputImage ? (
-                <div className="relative">
-                  <img
-                    src={URL.createObjectURL(inputImage)}
-                    alt="Input image"
-                    className="w-full h-48 object-cover rounded-lg"
-                  />
-                  <button
-                    onClick={removeInputImage}
-                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 transition-colors"
-                  >
-                    ×
-                  </button>
-                </div>
-              ) : (
-                <div
-                  onClick={() => inputImageRef.current?.click()}
-                  className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition-colors"
-                >
-                  <div className="flex flex-col items-center">
-                    <svg className="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    <p className="text-gray-600">Click to upload an image to edit</p>
-                  </div>
-                </div>
-              )}
-
-              <input
-                ref={inputImageRef}
-                type="file"
-                accept="image/*"
-                onChange={(e) => handleInputImageUpload(e.target.files)}
-                className="hidden"
-              />
-            </div>
           </div>
 
           {/* Output Panel */}
@@ -277,7 +289,7 @@ export default function ImageStudioPage() {
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mb-4"></div>
                 <p className="text-gray-600">Generating image with Gemini AI...</p>
                 <p className="text-sm text-gray-500 mt-2">
-                  {inputImage ? 'Editing your uploaded image...' : 'Creating a new image from your prompt...'}
+                  Creating a new image from your prompt...
                 </p>
               </div>
             ) : generatedImage ? (
@@ -289,7 +301,7 @@ export default function ImageStudioPage() {
                 />
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <h4 className="text-sm font-semibold text-blue-900 mb-2">
-                    {generatedImage.hasInputImage ? 'Image Edited with:' : 'Generated with prompt:'}
+                    Generated with prompt:
                   </h4>
                   <p className="text-sm text-blue-800 leading-relaxed">{generatedImage.prompt}</p>
                 </div>
@@ -306,6 +318,12 @@ export default function ImageStudioPage() {
                     Download
                   </button>
                   <button
+                    onClick={handleSubmitToGallery}
+                    className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+                  >
+                    Submit
+                  </button>
+                  <button
                     onClick={() => setGeneratedImage(null)}
                     className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
                   >
@@ -320,10 +338,7 @@ export default function ImageStudioPage() {
                 </svg>
                 <p className="text-gray-500 mb-2">Your generated image will appear here.</p>
                 <p className="text-sm text-gray-400">
-                  {inputImage 
-                    ? 'Upload an image and describe how you want to edit it, or generate a new image from scratch.'
-                    : 'Describe what you want to see and Gemini AI will create it for you.'
-                  }
+                  Describe what you want to see and Gemini AI will create it for you.
                 </p>
               </div>
             )}
@@ -343,12 +358,7 @@ export default function ImageStudioPage() {
             disabled={isGenerating || !prompt.trim()}
             className="bg-black text-white px-8 py-4 rounded-xl text-lg font-medium hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isGenerating 
-              ? 'Generating...' 
-              : inputImage 
-                ? 'Edit Image' 
-                : 'Generate Image'
-            }
+            {isGenerating ? 'Generating...' : 'Generate Image'}
           </button>
         </div>
       </main>

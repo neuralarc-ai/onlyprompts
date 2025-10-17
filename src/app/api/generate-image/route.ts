@@ -7,15 +7,11 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const prompt = formData.get('prompt') as string;
-    const aspectRatio = formData.get('aspectRatio') as string || '1:1';
 
     if (!prompt) {
       return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
     }
 
-    // Get input image for editing (if provided)
-    const inputImage = formData.get('inputImage') as File;
-    
     // Get reference images (for style reference)
     const referenceImages: File[] = [];
     for (let i = 0; i < 5; i++) {
@@ -35,18 +31,6 @@ export async function POST(request: NextRequest) {
 
     // Add text prompt
     contentParts.push({ text: prompt });
-
-    // Add input image for editing if provided
-    if (inputImage) {
-      const arrayBuffer = await inputImage.arrayBuffer();
-      const base64 = Buffer.from(arrayBuffer).toString('base64');
-      contentParts.push({
-        inlineData: {
-          data: base64,
-          mimeType: inputImage.type,
-        },
-      });
-    }
 
     // Add reference images for style guidance
     if (referenceImages.length > 0) {
@@ -92,10 +76,8 @@ export async function POST(request: NextRequest) {
       imageBase64: generatedImageBase64,
       mimeType: generatedImageMimeType,
       prompt: prompt,
-      aspectRatio: aspectRatio,
       success: true,
       model: 'gemini-2.5-flash-image',
-      hasInputImage: !!inputImage,
       referenceImagesCount: referenceImages.length
     });
 
