@@ -29,6 +29,7 @@ export default function SuperAdminDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
+  const [searchQuery, setSearchQuery] = useState('');
   const [rejectReason, setRejectReason] = useState('');
   const [showRejectModal, setShowRejectModal] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState<string | null>(null);
@@ -45,18 +46,30 @@ export default function SuperAdminDashboard() {
     }
   }, [isSuperAdmin]);
 
-  // Handle filter changes without refetching
+  // Handle filter and search changes without refetching
   useEffect(() => {
     if (allPrompts.length > 0) {
-      let filteredData;
-      if (filter === 'all') {
-        filteredData = allPrompts;
-      } else {
-        filteredData = allPrompts.filter(p => p.approval_status === filter);
+      let filteredData = allPrompts;
+      
+      // Apply status filter
+      if (filter !== 'all') {
+        filteredData = filteredData.filter(p => p.approval_status === filter);
       }
+      
+      // Apply search filter
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase().trim();
+        filteredData = filteredData.filter(p => 
+          p.title.toLowerCase().includes(query) ||
+          p.prompt.toLowerCase().includes(query) ||
+          p.author.toLowerCase().includes(query) ||
+          (p.tags && p.tags.some(tag => tag.toLowerCase().includes(query)))
+        );
+      }
+      
       setPrompts(filteredData);
     }
-  }, [filter, allPrompts]);
+  }, [filter, searchQuery, allPrompts]);
 
   const checkSuperAdminStatus = async () => {
     if (!user) return;
@@ -235,6 +248,39 @@ export default function SuperAdminDashboard() {
           </div>
         )}
 
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="relative max-w-md">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <input
+              type="text"
+              placeholder="Search prompts by title, content, author, or tags..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              >
+                <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+          {searchQuery && (
+            <p className="mt-2 text-sm text-gray-600">
+              Showing {prompts.length} result{prompts.length !== 1 ? 's' : ''} for "{searchQuery}"
+            </p>
+          )}
+        </div>
+
         {/* Filter Tabs */}
         <div className="mb-6">
           <div className="border-b border-gray-200">
@@ -265,7 +311,20 @@ export default function SuperAdminDashboard() {
         <div className="space-y-6">
           {prompts.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500">No prompts found for the selected filter.</p>
+              <p className="text-gray-500">
+                {searchQuery 
+                  ? `No prompts found matching "${searchQuery}" for the selected filter.`
+                  : 'No prompts found for the selected filter.'
+                }
+              </p>
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="mt-2 text-blue-600 hover:text-blue-800 text-sm"
+                >
+                  Clear search
+                </button>
+              )}
             </div>
           ) : (
             prompts.map((prompt) => (
