@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
@@ -11,9 +11,28 @@ import Logo from './Logo';
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isStudioDropdownOpen, setIsStudioDropdownOpen] = useState(false);
   const { user, signOut } = useAuth();
   const { isSuperAdmin } = useSuperAdmin();
   const router = useRouter();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsStudioDropdownOpen(false);
+      }
+    };
+
+    if (isStudioDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isStudioDropdownOpen]);
 
   const handleSubmitClick = () => {
     if (!user) {
@@ -21,13 +40,23 @@ export default function Header() {
     } else {
       router.push('/submit');
     }
+    setIsStudioDropdownOpen(false);
+  };
+
+  const handleGenerateClick = () => {
+    if (!user) {
+      setShowAuthModal(true);
+    } else {
+      router.push('/studio');
+    }
+    setIsStudioDropdownOpen(false);
   };
 
   const handleStudioClick = () => {
     if (!user) {
       setShowAuthModal(true);
     } else {
-      router.push('/studio');
+      setIsStudioDropdownOpen(!isStudioDropdownOpen);
     }
   };
 
@@ -55,23 +84,44 @@ export default function Header() {
             <Link href="/categories" className="text-gray-700 hover:text-gray-900 transition-colors">
               Explore
             </Link>
-            <button
-              onClick={handleStudioClick}
-              className="text-gray-700 hover:text-gray-900 transition-colors"
-            >
-              Studio
-            </button>
+            
             {user && (
               <Link href="/my-prompts" className="text-gray-700 hover:text-gray-900 transition-colors">
                 My Prompts
               </Link>
             )}
-            <button
-              onClick={handleSubmitClick}
-              className="text-gray-700 hover:text-gray-900 transition-colors"
-            >
-              Submit
-            </button>
+            
+            {/* Studio Dropdown */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={handleStudioClick}
+                className="text-gray-700 hover:text-gray-900 transition-colors flex items-center"
+              >
+                Studio
+                <svg className="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {isStudioDropdownOpen && (
+                <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
+                  <div className="py-1">
+                    <button
+                      onClick={handleSubmitClick}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                    >
+                      Submit Prompt
+                    </button>
+                    <button
+                      onClick={handleGenerateClick}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                    >
+                      Generate Image
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
             {isSuperAdmin && (
               <Link href="/admin/dashboard" className="text-gray-700 hover:text-gray-900 transition-colors font-medium">
                 Admin
@@ -161,15 +211,7 @@ export default function Header() {
               >
                 Explore
               </Link>
-              <button
-                onClick={() => {
-                  handleStudioClick();
-                  setIsMenuOpen(false);
-                }}
-                className="block w-full text-left px-3 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
-              >
-                Studio
-              </button>
+              
               {user && (
                 <Link
                   href="/my-prompts"
@@ -179,15 +221,42 @@ export default function Header() {
                   My Prompts
                 </Link>
               )}
-              <button
-                onClick={() => {
-                  handleSubmitClick();
-                  setIsMenuOpen(false);
-                }}
-                className="block w-full text-left px-3 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
-              >
-                Submit
-              </button>
+              
+              {/* Mobile Studio Dropdown */}
+              <div className="px-3 py-2">
+                <button
+                  onClick={() => setIsStudioDropdownOpen(!isStudioDropdownOpen)}
+                  className="flex items-center justify-between w-full text-left text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md px-3 py-2"
+                >
+                  Studio
+                  <svg className={`h-4 w-4 transition-transform ${isStudioDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                
+                {isStudioDropdownOpen && (
+                  <div className="ml-4 mt-2 space-y-1">
+                    <button
+                      onClick={() => {
+                        handleSubmitClick();
+                        setIsMenuOpen(false);
+                      }}
+                      className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md"
+                    >
+                      Submit Prompt
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleGenerateClick();
+                        setIsMenuOpen(false);
+                      }}
+                      className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md"
+                    >
+                      Generate Image
+                    </button>
+                  </div>
+                )}
+              </div>
               {isSuperAdmin && (
                 <Link
                   href="/admin/dashboard"

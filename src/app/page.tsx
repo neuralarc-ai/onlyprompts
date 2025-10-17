@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Hero from '@/components/Hero';
@@ -13,6 +13,7 @@ import { useAuth } from '@/hooks/useAuth';
 
 function HomeContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [showAuthModal, setShowAuthModal] = useState(false);
   // Modal state removed - now using direct navigation to prompt pages
@@ -145,18 +146,17 @@ function HomeContent() {
           </div>
         )}
 
-        {/* Load All Prompts Button */}
+        {/* Explore More Prompts Button */}
         {filteredPrompts.length > 0 && hasMore && (
           <div className="text-center mt-12">
             <button 
-              onClick={loadAllPrompts}
-              disabled={loading}
-              className="bg-white border border-gray-300 text-gray-700 px-8 py-3 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => router.push('/categories')}
+              className="bg-white border border-gray-300 text-gray-700 px-8 py-3 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium shadow-sm"
             >
-              {loading ? 'Loading All Prompts...' : 'Load All Prompts & Scroll to Explore'}
+              Explore more prompts
             </button>
             <p className="text-sm text-gray-500 mt-2">
-              Load all available prompts and continue scrolling from where you left off
+              Discover all available prompts with advanced filtering and search
             </p>
           </div>
         )}

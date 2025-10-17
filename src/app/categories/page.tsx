@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -46,8 +46,15 @@ export default function CategoriesPage() {
     loadAllPrompts,
     refresh 
   } = usePrompts({
-    limit: 12
+    limit: 12 // Start with a small limit, then load all
   });
+
+  // Automatically load all prompts when the component mounts
+  useEffect(() => {
+    if (!loading && allPrompts.length > 0 && hasMore) {
+      loadAllPrompts();
+    }
+  }, [loading, allPrompts.length, hasMore, loadAllPrompts]);
 
   // Filter prompts based on selected tags - ALL selected tags must match
   const filteredPrompts = allPrompts.filter(prompt => {
@@ -284,21 +291,6 @@ export default function CategoriesPage() {
             </div>
           )}
 
-          {/* Load All Prompts Button */}
-          {filteredPrompts.length > 0 && hasMore && (
-            <div className="text-center mt-12">
-              <button 
-                onClick={loadAllPrompts}
-                disabled={loading}
-                className="bg-black text-white px-8 py-3 rounded-xl hover:bg-gray-800 transition-all duration-200 font-medium shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? 'Loading All Prompts...' : 'Load All Prompts & Scroll to Explore'}
-              </button>
-              <p className="text-sm text-gray-500 mt-2">
-                Load all available prompts and continue scrolling from where you left off
-              </p>
-            </div>
-          )}
         </div>
       </main>
 
