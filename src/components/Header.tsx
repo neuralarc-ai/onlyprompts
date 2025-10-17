@@ -23,6 +23,14 @@ export default function Header() {
     }
   };
 
+  const handleStudioClick = () => {
+    if (!user) {
+      setShowAuthModal(true);
+    } else {
+      router.push('/studio');
+    }
+  };
+
   return (
     <header className="py-4">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -47,9 +55,12 @@ export default function Header() {
             <Link href="/categories" className="text-gray-700 hover:text-gray-900 transition-colors">
               Explore
             </Link>
-            <Link href="/studio" className="text-gray-700 hover:text-gray-900 transition-colors">
+            <button
+              onClick={handleStudioClick}
+              className="text-gray-700 hover:text-gray-900 transition-colors"
+            >
               Studio
-            </Link>
+            </button>
             {user && (
               <Link href="/my-prompts" className="text-gray-700 hover:text-gray-900 transition-colors">
                 My Prompts
@@ -150,13 +161,15 @@ export default function Header() {
               >
                 Explore
               </Link>
-              <Link
-                href="/studio"
-                className="block px-3 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
-                onClick={() => setIsMenuOpen(false)}
+              <button
+                onClick={() => {
+                  handleStudioClick();
+                  setIsMenuOpen(false);
+                }}
+                className="block w-full text-left px-3 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
               >
                 Studio
-              </Link>
+              </button>
               {user && (
                 <Link
                   href="/my-prompts"

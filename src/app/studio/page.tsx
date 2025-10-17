@@ -174,50 +174,8 @@ export default function ImageStudioPage() {
               </div>
             </div>
 
-            {/* Input Image Section */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Input Image (Optional)</h3>
-              <p className="text-sm text-gray-600 mb-4">Upload an image to edit with your prompt</p>
-              
-              {inputImage ? (
-                <div className="relative">
-                  <img
-                    src={URL.createObjectURL(inputImage)}
-                    alt="Input image"
-                    className="w-full h-48 object-cover rounded-lg"
-                  />
-                  <button
-                    onClick={removeInputImage}
-                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 transition-colors"
-                  >
-                    ×
-                  </button>
-                </div>
-              ) : (
-                <div
-                  onClick={() => inputImageRef.current?.click()}
-                  className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition-colors"
-                >
-                  <div className="flex flex-col items-center">
-                    <svg className="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    <p className="text-gray-600">Click to upload an image to edit</p>
-                  </div>
-                </div>
-              )}
-
-              <input
-                ref={inputImageRef}
-                type="file"
-                accept="image/*"
-                onChange={(e) => handleInputImageUpload(e.target.files)}
-                className="hidden"
-              />
-            </div>
-
             {/* Reference Images Section */}
-            <div>
+            <div className="mb-8">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Reference images</h3>
               <p className="text-sm text-gray-600 mb-4">Optional - max 5 - 10MB each</p>
               
@@ -265,6 +223,48 @@ export default function ImageStudioPage() {
                   ))}
                 </div>
               )}
+            </div>
+
+            {/* Input Image Section */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Input Image (Optional)</h3>
+              <p className="text-sm text-gray-600 mb-4">Upload an image to edit with your prompt</p>
+              
+              {inputImage ? (
+                <div className="relative">
+                  <img
+                    src={URL.createObjectURL(inputImage)}
+                    alt="Input image"
+                    className="w-full h-48 object-cover rounded-lg"
+                  />
+                  <button
+                    onClick={removeInputImage}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 transition-colors"
+                  >
+                    ×
+                  </button>
+                </div>
+              ) : (
+                <div
+                  onClick={() => inputImageRef.current?.click()}
+                  className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition-colors"
+                >
+                  <div className="flex flex-col items-center">
+                    <svg className="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    <p className="text-gray-600">Click to upload an image to edit</p>
+                  </div>
+                </div>
+              )}
+
+              <input
+                ref={inputImageRef}
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleInputImageUpload(e.target.files)}
+                className="hidden"
+              />
             </div>
           </div>
 
