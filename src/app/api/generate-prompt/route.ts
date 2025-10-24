@@ -33,6 +33,7 @@ Please respond in this exact JSON format:
 
 IMPORTANT: 
 - Title should be max 50 characters
+- Title should NOT contain asterisks (*) or any special formatting characters
 - Tags must be comma-separated with spaces after commas (e.g., "portrait, studio, professional, lighting, editorial")
 - Choose 3-5 relevant tags that describe the content, style, or subject matter
 - Do not use quotes around individual tags, just separate with commas`;
@@ -56,16 +57,25 @@ IMPORTANT:
             }
           }
           
+          // Clean title to remove any asterisks or special characters
+          let cleanTitle = parsed.title || 'Generated Prompt';
+          if (typeof cleanTitle === 'string') {
+            cleanTitle = cleanTitle.replace(/[*]/g, '').trim();
+          }
+          
           return NextResponse.json({
-            title: parsed.title || 'Generated Prompt',
+            title: cleanTitle,
             tags: cleanTags,
             success: true
           });
         } catch (parseError) {
           // Fallback if JSON parsing fails
           const lines = generatedText.split('\n');
-          const title = lines.find(line => line.includes('title'))?.split(':')[1]?.replace(/[",]/g, '').trim() || 'Generated Prompt';
+          let title = lines.find(line => line.includes('title'))?.split(':')[1]?.replace(/[",]/g, '').trim() || 'Generated Prompt';
           let tags = lines.find(line => line.includes('tags'))?.split(':')[1]?.replace(/["]/g, '').trim() || 'ai, generated, prompt';
+          
+          // Clean title to remove any asterisks
+          title = title.replace(/[*]/g, '').trim();
           
           // Ensure tags are comma-separated in fallback too
           if (tags && !tags.includes(',')) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -12,8 +12,32 @@ export default function ImageStudioPage() {
   const [generatedImage, setGeneratedImage] = useState<{imageUrl: string, prompt: string} | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [shouldAutoGenerate, setShouldAutoGenerate] = useState(false);
+  const [showReferenceImageModal, setShowReferenceImageModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Check for stored prompt from prompt studio page
+  useEffect(() => {
+    const storedPrompt = sessionStorage.getItem('generatedPrompt');
+    const autoGenerate = sessionStorage.getItem('autoGenerate');
+    if (storedPrompt) {
+      setPrompt(storedPrompt);
+      // Clear the stored prompt so it doesn't interfere with future visits
+      sessionStorage.removeItem('generatedPrompt');
+      if (autoGenerate === 'true') {
+        setShouldAutoGenerate(true);
+        sessionStorage.removeItem('autoGenerate');
+      }
+    }
+  }, []);
+
+  // Show reference image modal if coming from prompt studio
+  useEffect(() => {
+    if (shouldAutoGenerate && prompt.trim() && !isGenerating) {
+      setShouldAutoGenerate(false);
+      setShowReferenceImageModal(true);
+    }
+  }, [shouldAutoGenerate, prompt, isGenerating]);
 
   const handleFileUpload = (files: FileList | null) => {
     if (!files) return;
@@ -46,6 +70,25 @@ export default function ImageStudioPage() {
 
   const removeImage = (index: number) => {
     setReferenceImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleStartGeneration = () => {
+    setShowReferenceImageModal(false);
+    handleGenerate();
+  };
+
+  const handleSkipReferenceImage = () => {
+    setShowReferenceImageModal(false);
+    handleGenerate();
+  };
+
+  const handleFileUploadWithGeneration = (files: FileList | null) => {
+    handleFileUpload(files);
+    setShowReferenceImageModal(false);
+    // Start generation after a short delay to allow the file to be processed
+    setTimeout(() => {
+      handleGenerate();
+    }, 100);
   };
 
   const handleGenerate = async () => {
@@ -252,7 +295,13 @@ export default function ImageStudioPage() {
                 type="file"
                 multiple
                 accept="image/*"
-                onChange={(e) => handleFileUpload(e.target.files)}
+                onChange={(e) => {
+                  if (showReferenceImageModal) {
+                    handleFileUploadWithGeneration(e.target.files);
+                  } else {
+                    handleFileUpload(e.target.files);
+                  }
+                }}
                 className="hidden"
               />
 
@@ -362,6 +411,47 @@ export default function ImageStudioPage() {
           </button>
         </div>
       </main>
+
+      {/* Reference Image Modal */}
+      {showReferenceImageModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-xl">
+            <div className="text-center">
+              <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                Add Your Image?
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Would you like to add your image to guide the AI generation? This is optional but can help create more accurate results.
+              </p>
+              
+              <div className="space-y-3">
+                <button
+                  onClick={() => {
+                    setShowReferenceImageModal(false);
+                    fileInputRef.current?.click();
+                  }}
+                  className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                >
+                  Add Your Image
+                </button>
+                
+                <button
+                  onClick={handleSkipReferenceImage}
+                  className="w-full bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+                >
+                  Skip and Generate
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>
