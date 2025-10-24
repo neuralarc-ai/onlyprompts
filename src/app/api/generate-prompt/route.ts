@@ -130,6 +130,11 @@ IMPORTANT:
 5. Include technical details like camera settings, lens type, or artistic style if relevant
 6. Be written in a way that would work well for AI image generation tools
 
+IMPORTANT: 
+- Do NOT use asterisks (*) or any special formatting characters in the prompt
+- Write the prompt in plain text without any markdown formatting
+- Avoid bullet points, asterisks, or other special characters
+
 Make the prompt engaging and comprehensive while being practical for image generation.`
       },
       {
@@ -149,8 +154,11 @@ Make the prompt engaging and comprehensive while being practical for image gener
       throw new Error('No prompt was generated');
     }
 
+    // Clean the generated prompt to remove any asterisks or special formatting
+    const cleanedPrompt = generatedPrompt.replace(/[*]/g, '').trim();
+
     return NextResponse.json({
-      prompt: generatedPrompt,
+      prompt: cleanedPrompt,
       success: true,
       model: 'gemini-2.5-flash',
       imageName: image.name,
