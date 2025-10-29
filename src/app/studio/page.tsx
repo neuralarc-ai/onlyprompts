@@ -273,7 +273,14 @@ export default function ImageStudioPage() {
             {/* Reference Images Section */}
             <div className="mb-8">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Your image</h3>
-              <p className="text-sm text-gray-600 mb-4">Optional - max 5 - 10MB each</p>
+              <p className="text-sm text-gray-600 mb-4">
+                Optional - max 5 - 10MB each
+                {referenceImages.length > 0 && (
+                  <span className="ml-2 text-blue-600 font-medium">
+                    ✓ Will be used as reference for generation
+                  </span>
+                )}
+              </p>
               
               {/* Upload Area */}
               <div
@@ -338,8 +345,16 @@ export default function ImageStudioPage() {
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mb-4"></div>
                 <p className="text-gray-600">Generating image with Gemini AI...</p>
                 <p className="text-sm text-gray-500 mt-2">
-                  Creating a new image from your prompt...
+                  {referenceImages.length > 0 
+                    ? `Creating image using your uploaded image${referenceImages.length > 1 ? 's' : ''} as reference...`
+                    : 'Creating a new image from your prompt...'
+                  }
                 </p>
+                {referenceImages.length > 0 && (
+                  <p className="text-xs text-blue-600 mt-1">
+                    Reference image{referenceImages.length > 1 ? 's' : ''} will heavily influence the result
+                  </p>
+                )}
               </div>
             ) : generatedImage ? (
               <div className="space-y-4">
@@ -353,6 +368,13 @@ export default function ImageStudioPage() {
                     Generated with prompt:
                   </h4>
                   <p className="text-sm text-blue-800 leading-relaxed">{generatedImage.prompt}</p>
+                  {referenceImages.length > 0 && (
+                    <div className="mt-2 pt-2 border-t border-blue-200">
+                      <p className="text-xs text-blue-700 font-medium">
+                        ✓ Generated using {referenceImages.length} reference image{referenceImages.length > 1 ? 's' : ''}
+                      </p>
+                    </div>
+                  )}
                 </div>
                 <div className="flex gap-2">
                   <button
